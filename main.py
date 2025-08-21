@@ -32,6 +32,7 @@ def gameover_actions():
 
 def gamedone_loop():
     main_game = Main()
+    global gameover_sound_played  # Telling the function to use the global variable
     while True:
         # Defining a screen of game over
         # gameover_rect = pygame.Rect(0, 0, cell_size * cell_number, cell_size * cell_number)
@@ -39,14 +40,32 @@ def gamedone_loop():
         # Text: Game over. Score: Best score: Replay: Exit:
         screen.fill((20, 20, 20))
 
+        title_position = (cell_number/2 * cell_size), (cell_number/8 * cell_size)  # Defining position for the text
+        title_font = pygame.font.Font('Fonts/Cute Dino.ttf', 50)  # Choice of font
+        title_text = title_font.render('Game Over', True, (255, 255, 255))
+        title_rect = title_text.get_rect(center = title_position)
+        screen.blit(title_text, title_rect)
+
+
         # Setting up restart button
-        restart_position = (cell_number/2 * cell_size), (cell_number/2 * cell_size)  # Positioning button
+        restart_position = (cell_number/2 * cell_size), (10 * cell_size)  # Positioning button
         # Defining font and size
         restart_font = pygame.font.Font('Fonts/Cute Dino.ttf', 35)
         # Using the Button class to create the button
         restart_button = Button(None, restart_position, "Restart", restart_font, (100,100,100), (150,150,150))
         restart_button.update(screen) # The function to display the button
         restart_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
+        screen.blit(restart_button.text, restart_button.rect)
+
+        # Setting up quit button
+        quit_position = (cell_number / 2 * cell_size), (12 * cell_size)  # Positioning button
+        # Defining font and size
+        quit_font = pygame.font.Font('Fonts/Cute Dino.ttf', 35)
+        # Using the Button class to create the button
+        quit_button = Button(None, quit_position, "Quit", quit_font, (100, 100, 100), (150, 150, 150))
+        quit_button.update(screen)  # The function to display the button
+        quit_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
+        screen.blit(quit_button.text, quit_button.rect)
 
         gameover_actions()
         for event in pygame.event.get():  # When starting the game we check for all events
@@ -54,12 +73,19 @@ def gamedone_loop():
                 main_game.close_game()  # Closing game
             if event.type == pygame.KEYDOWN:  # Checking for user input and defining direction by the key
                 if event.key == pygame.K_r:
-                    global gameover_sound_played  # Telling the function to use the global variable
                     gameover_sound_played = False  # Resetting the variable so the sound will play
                     main_game = Main()  # Restarting the game if the input is r
                     snake_loop()
                 elif event.key == pygame.K_ESCAPE:
                     main_game.close_game()  # Closing game
+            if event.type == pygame.MOUSEBUTTONDOWN:  # Checking if the player pressed the restart button
+                if restart_button.check_input(pygame.mouse.get_pos()):
+                    gameover_sound_played = False  # Resetting the variable so the sound will play
+                    main_game = Main()  # Restarting the game if the input is r
+                    snake_loop()
+                elif quit_button.check_input(pygame.mouse.get_pos()):  # Quitting if button was pressed
+                    main_game.close_game()  # Closing game
+
 
         pygame.display.update()
 
