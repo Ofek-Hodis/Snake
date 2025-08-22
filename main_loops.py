@@ -9,6 +9,7 @@ pygame.init()  # Initiating pygame
 
 # To import Main we must initiate pygame firstly
 from classes import cell_number, cell_size, Main  # Imported variables and the Main class to run the main code
+from menu_drawing import title_draw
 
 # Creating the window and defining the width and height
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
@@ -18,6 +19,54 @@ SCREEN_UPDATE = pygame.USEREVENT  # Creating an event
 pygame.time.set_timer(SCREEN_UPDATE, 90)  # Setting a timer to trigger the event every 150 milliseconds
 
 gameover_sound_played = False  # Defining a variable to prevent replay of gameover sound
+font = 'Fonts/Cute Dino.ttf'
+
+def menu_loop():
+    global font  # Telling the function to use the global font variable
+    while True:
+        screen.fill((175, 215, 70))
+
+        title_position = (cell_number / 2 * cell_size), (cell_number / 8 * cell_size)  # Defining position for the text
+        # Using a function to draw the title
+        title_draw("snake", title_position, font, 50, (255, 255, 255), screen)
+
+        # Setting up start button
+        start_position = (cell_number / 2 * cell_size), (10 * cell_size)  # Positioning button
+        # Defining font and size
+        start_font = pygame.font.Font(font, 35)
+        # Using the Button class to create the button
+        start_button = Button(None, start_position, "Single player mode", start_font, (100, 100, 100), (150, 150, 150))
+        start_button.update(screen)  # The function to display the button
+        start_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
+        screen.blit(start_button.text, start_button.rect)
+
+        # Setting up quit button
+        quit_position = (cell_number / 2 * cell_size), (12 * cell_size)  # Positioning button
+        # Defining font and size
+        quit_font = pygame.font.Font(font, 35)
+        # Using the Button class to create the button
+        quit_button = Button(None, quit_position, "Quit", quit_font, (100, 100, 100), (150, 150, 150))
+        quit_button.update(screen)  # The function to display the button
+        quit_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
+        screen.blit(quit_button.text, quit_button.rect)
+
+        for event in pygame.event.get():  # When starting the game we check for all events
+            if event.type == pygame.QUIT:  # If the user closes the window, quit the program
+                pygame.quit()  # Closing game
+                sys.exit()
+            if event.type == pygame.KEYDOWN:  # Checking for user input and defining direction by the key
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()  # Closing game
+                    sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:  # Checking if the player pressed a button
+                if start_button.check_input(pygame.mouse.get_pos()):
+                    snake_loop()
+                    break
+                elif quit_button.check_input(pygame.mouse.get_pos()):
+                    pygame.quit()  # Closing game
+                    sys.exit()
+
+        pygame.display.update()
 
 
 def gameover_actions():
@@ -33,24 +82,19 @@ def gameover_actions():
 def gamedone_loop():
     main_game = Main()
     global gameover_sound_played  # Telling the function to use the global variable
-    while True:
-        # Defining a screen of game over
-        # gameover_rect = pygame.Rect(0, 0, cell_size * cell_number, cell_size * cell_number)
-        # pygame.draw.rect(screen, (20, 20, 20), gameover_rect)
-        # Text: Game over. Score: Best score: Replay: Exit:
+    global font
+
+    while True:#Score and best score
         screen.fill((20, 20, 20))
 
         title_position = (cell_number/2 * cell_size), (cell_number/8 * cell_size)  # Defining position for the text
-        title_font = pygame.font.Font('Fonts/Cute Dino.ttf', 50)  # Choice of font
-        title_text = title_font.render('Game Over', True, (255, 255, 255))
-        title_rect = title_text.get_rect(center = title_position)
-        screen.blit(title_text, title_rect)
-
+        # Using a function to draw the title
+        title_draw("Game Over", title_position, font, 50, (255, 255, 255), screen)
 
         # Setting up restart button
         restart_position = (cell_number/2 * cell_size), (10 * cell_size)  # Positioning button
         # Defining font and size
-        restart_font = pygame.font.Font('Fonts/Cute Dino.ttf', 35)
+        restart_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
         restart_button = Button(None, restart_position, "Restart", restart_font, (100,100,100), (150,150,150))
         restart_button.update(screen) # The function to display the button
@@ -60,7 +104,7 @@ def gamedone_loop():
         # Setting up quit button
         quit_position = (cell_number / 2 * cell_size), (12 * cell_size)  # Positioning button
         # Defining font and size
-        quit_font = pygame.font.Font('Fonts/Cute Dino.ttf', 35)
+        quit_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
         quit_button = Button(None, quit_position, "Quit", quit_font, (100, 100, 100), (150, 150, 150))
         quit_button.update(screen)  # The function to display the button
@@ -78,7 +122,7 @@ def gamedone_loop():
                     snake_loop()
                 elif event.key == pygame.K_ESCAPE:
                     main_game.close_game()  # Closing game
-            if event.type == pygame.MOUSEBUTTONDOWN:  # Checking if the player pressed the restart button
+            if event.type == pygame.MOUSEBUTTONDOWN:  # Checking if the player pressed a button
                 if restart_button.check_input(pygame.mouse.get_pos()):
                     gameover_sound_played = False  # Resetting the variable so the sound will play
                     main_game = Main()  # Restarting the game if the input is r
@@ -127,6 +171,6 @@ def snake_loop():
         pygame.display.update()
         clock.tick(60)  # Limiting the loop (and the game) to 60 fps
 
-snake_loop()
+menu_loop()
 
 
