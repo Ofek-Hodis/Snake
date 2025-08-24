@@ -30,7 +30,7 @@ def menu_loop():
         # Using a function to draw the title
         title_draw("snake", title_position, font, 50, (255, 255, 255), screen)
 
-        # Setting up start button
+        # Setting up start (singleplayer) button
         start_position = (cell_number / 2 * cell_size), (10 * cell_size)  # Positioning button
         # Defining font and size
         start_font = pygame.font.Font(font, 35)
@@ -40,8 +40,18 @@ def menu_loop():
         start_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(start_button.text, start_button.rect)
 
+        # Setting up two player start button
+        two_player_position = (cell_number / 2 * cell_size), (12 * cell_size)  # Positioning button
+        # Defining font and size
+        two_player_font = pygame.font.Font(font, 35)
+        # Using the Button class to create the button
+        two_player_button = Button(None, two_player_position, "Two player mode", start_font, (100, 100, 100), (150, 150, 150))
+        two_player_button.update(screen)  # The function to display the button
+        two_player_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
+        screen.blit(two_player_button.text, two_player_button.rect)
+
         # Setting up quit button
-        quit_position = (cell_number / 2 * cell_size), (12 * cell_size)  # Positioning button
+        quit_position = (cell_number / 2 * cell_size), (14 * cell_size)  # Positioning button
         # Defining font and size
         quit_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
