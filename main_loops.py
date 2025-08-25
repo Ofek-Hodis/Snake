@@ -1,7 +1,8 @@
 import pygame  # Importing pygame for the creation of the game
 import sys  # Importing sys to use the exit function to halt the code
 from pygame.math import Vector2  # Importing the specific function to facilitate code writing
-from button import Button
+from button import Button  # Importing button class
+from support_funcs import get_high_score, store_high_score  # Importing functions to store and get high score
 
 # Code to set up delay in sound so that it fits the actions
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -9,7 +10,7 @@ pygame.init()  # Initiating pygame
 
 # To import Main we must initiate pygame firstly
 from classes import cell_number, cell_size, Main  # Imported variables and the Main class to run the main code
-from menu_drawing import title_draw
+from support_funcs import title_draw
 
 # Creating the window and defining the width and height
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
@@ -83,7 +84,7 @@ def menu_loop():
         pygame.display.update()
 
 
-def gameover_actions():
+def gameover_actions(score):
     global gameover_sound_played  # Letting the function know I use the variable from outside of it
     if not gameover_sound_played:
         # Playing game over sound
@@ -91,6 +92,10 @@ def gameover_actions():
         losing_sound.set_volume(0.25)  # Lowering the volume of the sound
         losing_sound.play()  # Playing the game over sound
         gameover_sound_played = True
+
+        top_score = get_high_score()
+        if score > top_score:
+            store_high_score(score)
 
 
 def gamedone_loop(score):
@@ -100,6 +105,8 @@ def gamedone_loop(score):
 
     while True:#Score and best score
         screen.fill((20, 20, 20))
+
+        gameover_actions(score)
 
         title_position = (cell_number/2 * cell_size), (3 * cell_size)  # Defining position for the text
         # Using a function to draw the title
@@ -129,7 +136,6 @@ def gamedone_loop(score):
         quit_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(quit_button.text, quit_button.rect)
 
-        gameover_actions()
         for event in pygame.event.get():  # When starting the game we check for all events
             if event.type == pygame.QUIT:  # If the user closes the window, quit the program
                 main_game.close_game()  # Closing game
