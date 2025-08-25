@@ -10,7 +10,7 @@ pygame.init()  # Initiating pygame
 
 # To import Main we must initiate pygame firstly
 from classes import cell_number, cell_size, Main  # Imported variables and the Main class to run the main code
-from support_funcs import title_draw
+from support_funcs import text_draw
 
 # Creating the window and defining the width and height
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
@@ -30,14 +30,15 @@ def menu_loop():
 
         title_position = (cell_number / 2 * cell_size), (3 * cell_size)  # Defining position for the text
         # Using a function to draw the title
-        title_draw("snake", title_position, font, 50, (255, 255, 255), screen)
+        text_draw("snake", title_position, font, 50, (255, 255, 255), screen)
 
         # Setting up start (singleplayer) button
         start_position = (cell_number / 2 * cell_size), (10 * cell_size)  # Positioning button
         # Defining font and size
         start_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
-        start_button = Button(None, start_position, "Single player mode", start_font, (100, 100, 100), (150, 150, 150))
+        start_button = Button(None, start_position, "Single player mode", start_font,
+                              (100, 100, 100), (150, 150, 150), "Sounds/menu_select.wav")
         start_button.update(screen)  # The function to display the button
         start_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(start_button.text, start_button.rect)
@@ -47,7 +48,8 @@ def menu_loop():
         # Defining font and size
         two_player_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
-        two_player_button = Button(None, two_player_position, "Two player mode", start_font, (100, 100, 100), (150, 150, 150))
+        two_player_button = Button(None, two_player_position, "Two player mode", start_font,
+                                   (100, 100, 100), (150, 150, 150), "Sounds/menu_select.wav")
         two_player_button.update(screen)  # The function to display the button
         two_player_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(two_player_button.text, two_player_button.rect)
@@ -57,7 +59,8 @@ def menu_loop():
         # Defining font and size
         quit_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
-        quit_button = Button(None, quit_position, "Quit", quit_font, (100, 100, 100), (150, 150, 150))
+        quit_button = Button(None, quit_position, "Quit", quit_font,
+                             (100, 100, 100), (150, 150, 150), "Sounds/menu_select.wav")
         quit_button.update(screen)  # The function to display the button
         quit_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(quit_button.text, quit_button.rect)
@@ -89,13 +92,17 @@ def gameover_actions(score):
     if not gameover_sound_played:
         # Playing game over sound
         losing_sound = pygame.mixer.Sound('Sounds/game_over.wav')
-        losing_sound.set_volume(0.25)  # Lowering the volume of the sound
+        losing_sound.set_volume(0.15)  # Lowering the volume of the sound
         losing_sound.play()  # Playing the game over sound
         gameover_sound_played = True
 
         top_score = get_high_score()
-        if score > top_score:
+        if score > top_score:  # Returning a message to be displayed based on user's performance
             store_high_score(score)
+            return "Congratulations! You broke your high score!"
+        elif score == top_score:
+            return "You almost broke your high score! You didn't tho."
+        return ""
 
 
 def gamedone_loop(score):
@@ -103,35 +110,46 @@ def gamedone_loop(score):
     global gameover_sound_played  # Telling the function to use the global variable
     global font
 
-    while True:#Score and best score
+    score_msg = gameover_actions(score)  # Storing if the player broke the high score or not
+
+    while True:
         screen.fill((20, 20, 20))
 
-        gameover_actions(score)
-
-        title_position = (cell_number/2 * cell_size), (3 * cell_size)  # Defining position for the text
+        title_position = (cell_number / 2 * cell_size), (3 * cell_size)  # Defining position for the text
         # Using a function to draw the title
-        title_draw("Game Over", title_position, font, 50, (255, 255, 255), screen)
+        text_draw("Game Over", title_position, font, 50, (255, 255, 255), screen)
 
-        score_position = (cell_number / 2 * cell_size), (5 * cell_size)  # Defining position for the text
+        score_position = (cell_number / 2 * cell_size), (6 * cell_size)  # Defining position for the text
         # Using a function to draw the score
-        title_draw("Final Score: " + str(score), score_position, font, 35, (255, 255, 255), screen)
+        text_draw("Final Score: " + str(score), score_position, font, 30, (175, 175, 175), screen)
+
+        high_score_position = (cell_number / 2 * cell_size), (8 * cell_size)  # Defining position for the text
+        high_score = get_high_score()  # Getting high score from JSON file
+        # Using a function to draw the high score
+        text_draw("High Score: " + str(high_score), high_score_position, font, 30, (175, 175, 175), screen)
+
+        score_msg_position = (cell_number / 2 * cell_size), (10 * cell_size)  # Defining position for the text
+        # Using a function to draw the score message
+        text_draw(score_msg, score_msg_position, font, 25, (175, 175, 175), screen)
 
         # Setting up restart button
-        restart_position = (cell_number/2 * cell_size), (10 * cell_size)  # Positioning button
+        restart_position = (cell_number / 2 * cell_size), (14 * cell_size)  # Positioning button
         # Defining font and size
         restart_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
-        restart_button = Button(None, restart_position, "Restart", restart_font, (100,100,100), (150,150,150))
-        restart_button.update(screen) # The function to display the button
+        restart_button = Button(None, restart_position, "Restart", restart_font,
+                                (100, 100, 100), (200, 200, 200), "Sounds/menu_select.wav")
+        restart_button.update(screen)  # The function to display the button
         restart_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(restart_button.text, restart_button.rect)
 
         # Setting up quit button
-        quit_position = (cell_number / 2 * cell_size), (12 * cell_size)  # Positioning button
+        quit_position = (cell_number / 2 * cell_size), (16 * cell_size)  # Positioning button
         # Defining font and size
         quit_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
-        quit_button = Button(None, quit_position, "Quit", quit_font, (100, 100, 100), (150, 150, 150))
+        quit_button = Button(None, quit_position, "Quit", quit_font,
+                             (100, 100, 100), (200, 200, 200), "Sounds/menu_select.wav")
         quit_button.update(screen)  # The function to display the button
         quit_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(quit_button.text, quit_button.rect)
@@ -153,7 +171,6 @@ def gamedone_loop(score):
                     snake_loop()
                 elif quit_button.check_input(pygame.mouse.get_pos()):  # Quitting if button was pressed
                     main_game.close_game()  # Closing game
-
 
         pygame.display.update()
 
@@ -179,7 +196,8 @@ def snake_loop():
                         main_game.snake.next_direction = Vector2(1, 0)  # Preventing direction change from left to right
                 if event.key == pygame.K_LEFT:
                     if main_game.snake.direction.x != 1:
-                        main_game.snake.next_direction = Vector2(-1, 0)  # Preventing direction change from right to left
+                        main_game.snake.next_direction = Vector2(-1,
+                                                                 0)  # Preventing direction change from right to left
 
                 if event.key == pygame.K_r:
                     main_game = Main()  # Restarting the game if the input is r
@@ -217,7 +235,8 @@ def twoplayer_loop():
                         main_game.snake.next_direction = Vector2(1, 0)  # Preventing direction change from left to right
                 if event.key == pygame.K_LEFT:
                     if main_game.snake.direction.x != 1:
-                        main_game.snake.next_direction = Vector2(-1, 0)  # Preventing direction change from right to left
+                        main_game.snake.next_direction = Vector2(-1,
+                                                                 0)  # Preventing direction change from right to left
 
                 if event.key == pygame.K_r:
                     main_game = Main()  # Restarting the game if the input is r
@@ -235,5 +254,3 @@ def twoplayer_loop():
 
 
 menu_loop()
-
-

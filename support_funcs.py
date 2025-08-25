@@ -1,9 +1,8 @@
 import pygame  # Importing pygame for the creation of the game
 import json
-import os
 
 
-def title_draw(text, position, title_font, size, color, screen):
+def text_draw(text, position, title_font, size, color, screen):
     font = pygame.font.Font(title_font, size)
     title_text = font.render(text, True, color)
     title_rect = title_text.get_rect(center=position)
