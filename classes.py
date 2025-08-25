@@ -164,17 +164,27 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
         # Drawing a rectangle on screen, with an rgb tuple for colors, using the previously created rect
         # pygame.draw.rect(screen, (200, 40, 10), fruit_rect)
 
-    def randomize(self):  # When apple is eaten we will randomize new coordinates for another apple
-        self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
-        self.y = random.randint(0, cell_number - 1)  # Defining random y position
-        self.position = Vector2(self.x, self.y)
+    def randomize(self, snake1 = Snake(), snake2 = Snake(), twoplayers = False):  # When apple is eaten we will randomize new coordinates for another apple
+        while True:
+            self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
+            self.y = random.randint(0, cell_number - 1)  # Defining random y position
+            self.position = Vector2(self.x, self.y)
+            if twoplayers:
+                if self.position not in snake1.body and self.position not in snake2.body:
+                    break
+            elif self.position not in snake1.body:
+                break
 
 
-class Main:
-    def __init__(self):
+class Main():
+    def __init__(self, twoplayers = False):
         self.snake = Snake()
+        self.snake2 = Snake()
         self.fruit = Fruit()
+        self.fruit2 = Fruit()
         self.game_active = True  # Controlling game state
+        self.two_players = twoplayers
+
         # Clear screen right when a new game is created
 
     def update(self):  # Method to move the snake when the game updates
@@ -182,6 +192,10 @@ class Main:
             self.snake.move_snake()  # Moving the snake every update
             self.check_collision()  # Checking for collision with an apple
             self.check_fail()  # Checking if the player lost
+            if self.two_players:
+                self.snake2.move_snake()
+
+
 
     def draw_elements(self):  # Method to draw the fruit and snake
         if self.game_active:
@@ -189,16 +203,21 @@ class Main:
             self.fruit.draw_fruit()
             self.snake.draw_snake()
             self.draw_score()
+        if self.two_players:
+            self.snake2.draw_snake()
+            self.fruit2.draw_fruit()
 
     def check_collision(self):
         if self.fruit.position == self.snake.body[0]:
-            self.fruit.randomize()  # Changing location of the fruit
+            self.fruit.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
             self.snake.add_block()  # Making the snake longer
             self.snake.play_eat_sound()  # Playing sound of apple eaten
+        if self.two_players:
+            if self.fruit2.position == self.snake2.body[0]:
+                self.fruit2.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
+                self.snake2.add_block()  # Making the snake longer
+                self.snake2.play_eat_sound()  # Playing sound of apple eaten
 
-        for block in self.snake.body[1:]:  # Checking if the apple is on the body
-            if block == self.fruit.position:
-                self.fruit.randomize()
 
     def check_fail(self):  # Checking if the player failed and the game should be over
         # The cell number is are 0 based, so we subtract 1
@@ -211,6 +230,9 @@ class Main:
             if block == self.snake.body[0]:
                 print("Snake collided with itself!")
                 self.game_active = False  # Changing to false so the game stops running
+
+        if self.twoplayers:
+            pass # Add function
 
     @staticmethod  # The method doesn't use self
     def close_game():  # Method to quit the game
