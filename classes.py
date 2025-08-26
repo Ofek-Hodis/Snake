@@ -7,16 +7,13 @@ cell_size = 30  # Defining cell size of cubes in grid (not an actual grid, but w
 cell_number = 25  # Defining the amount of cells in the simulated grid
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 
-# Taking an apple photo and converting it to a format pygame can handle easily
-apple = pygame.image.load('Images/apple.png').convert_alpha()
-apple = pygame.transform.scale(apple, (cell_size, cell_size))  # Conversion of the photo to size of one cell
 game_font = pygame.font.Font('Fonts/Cute Dino.ttf', 25)  # Choosing the font for the score
 
 
 class Snake:
-    def __init__(self):
-        self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]  # Defining the starting position of the snake
-        self.direction = Vector2(1, 0)
+    def __init__(self, position = (5, 4, 3), height = 5, direction = 1):
+        self.body = [Vector2(position[0], height), Vector2(position[1], height), Vector2(position[2], height)]  # Defining the starting position of the snake
+        self.direction = Vector2(direction, 0)
         self.next_direction = self.direction  # Set initial next direction
         self.new_block = False  # Defining a variable to see if we want to add a block to the snake
 
@@ -153,7 +150,7 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
         # Setting up variables with x,y coordinates and the position
         self.x = 0
         self.y = 0  # Defining random y position
-        self.image = pygame.image.load(img).convert_alpha()
+        self.image = pygame.image.load(img).convert_alpha()  # Setting up the apple image
         self.image = pygame.transform.scale(self.image, (cell_size, cell_size))  # Conversion of the photo to size of one cell
         self.position = Vector2(self.x, self.y)
         self.randomize()  # Randomizing the position of the apple
@@ -181,9 +178,9 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
 class Main:
     def __init__(self, twoplayers = False):
         self.snake = Snake()
-        self.snake2 = Snake()
+        self.snake2 = Snake((18, 19, 20), 20, -1)
         self.fruit = Fruit()
-        self.fruit2 = Fruit()
+        self.fruit2 = Fruit('Images/orange.png')
         self.game_active = True  # Controlling game state
         self.two_players = twoplayers
 
@@ -197,7 +194,6 @@ class Main:
             if self.two_players:
                 self.snake2.move_snake()
                 self.check_fail_two()
-
 
     def draw_elements(self):  # Method to draw the fruit and snake
         if self.game_active:
