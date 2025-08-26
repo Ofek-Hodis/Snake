@@ -149,10 +149,12 @@ class Snake:
 
 
 class Fruit:  # Defining a class for the fruits that make the snake grow
-    def __init__(self):
+    def __init__(self, img = 'Images/apple.png'):
         # Setting up variables with x,y coordinates and the position
         self.x = 0
         self.y = 0  # Defining random y position
+        self.image = pygame.image.load(img).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (cell_size, cell_size))  # Conversion of the photo to size of one cell
         self.position = Vector2(self.x, self.y)
         self.randomize()  # Randomizing the position of the apple
 
@@ -160,7 +162,7 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
         # Creating a rectangle with given positions, width and height
         fruit_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y) * cell_size, cell_size,
                                  cell_size)
-        screen.blit(apple, fruit_rect)  # Placing the image where the rectangle is
+        screen.blit(self.image, fruit_rect)  # Placing the image where the rectangle is
         # Drawing a rectangle on screen, with an rgb tuple for colors, using the previously created rect
         # pygame.draw.rect(screen, (200, 40, 10), fruit_rect)
 
@@ -176,7 +178,7 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
                 break
 
 
-class Main():
+class Main:
     def __init__(self, twoplayers = False):
         self.snake = Snake()
         self.snake2 = Snake()
@@ -194,7 +196,7 @@ class Main():
             self.check_fail()  # Checking if the player lost
             if self.two_players:
                 self.snake2.move_snake()
-
+                self.check_fail_two()
 
 
     def draw_elements(self):  # Method to draw the fruit and snake
@@ -231,8 +233,31 @@ class Main():
                 print("Snake collided with itself!")
                 self.game_active = False  # Changing to false so the game stops running
 
-        if self.twoplayers:
-            pass # Add function
+
+    def check_fail_two(self):
+        # Checking if snake 2 is out of bounds
+        if (not 0 <= self.snake2.body[0].x < cell_number) or (not 0 <= self.snake2.body[0].y < cell_number):
+            print("Snake 2 out of bounds!")
+            self.game_active = False  # Changing to false so the game stops running
+
+        # Checking if snake2 collided with itself
+        for block in self.snake2.body[1:]:
+            if block == self.snake2.body[0]:
+                print("Snake 2 collided with itself!")
+                self.game_active = False  # Changing to false so the game stops running
+
+        # Checking if snake1 collided with snake2
+        for block in self.snake.body[1:]:
+            if block == self.snake2.body[0]:
+                print("Snake 2 collided with snake 1!")
+                self.game_active = False  # Changing to false so the game stops running
+
+        # Checking if snake2 collided with snake1
+        for block in self.snake2.body[1:]:
+            if block == self.snake.body[0]:
+                print("Snake 1 collided with snake 2!")
+                self.game_active = False  # Changing to false so the game stops running
+
 
     @staticmethod  # The method doesn't use self
     def close_game():  # Method to quit the game
@@ -255,7 +280,10 @@ class Main():
                         pygame.draw.rect(screen, grass_color, grass_rect)
 
     def draw_score(self):
-        score_text = str(len(self.snake.body) - 3)  # Taking the score based on length acquired (length starts at 3)
+        if not self.two_players:
+            score_text = str(len(self.snake.body) - 3)  # Taking the score based on length acquired (length starts at 3)
+        else:
+            score_text = str(len(self.snake.body)-3 + len(self.snake2.body) - 3)
         score_surface = game_font.render(score_text, True, (56, 74, 12))
         score_x = int(cell_size * cell_number - 30)  # Defining the coordinates for the score
         score_y = int(cell_size * cell_number - 30)
