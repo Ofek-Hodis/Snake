@@ -178,7 +178,7 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
 class Main:
     def __init__(self, twoplayers = False):
         self.snake = Snake()
-        self.snake2 = Snake((18, 19, 20), 20, -1)
+        self.snake2 = Snake((19, 20, 21), 20, -1)
         self.fruit = Fruit()
         self.fruit2 = Fruit('Images/orange.png')
         self.game_active = True  # Controlling game state
