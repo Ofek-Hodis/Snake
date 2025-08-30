@@ -202,7 +202,7 @@ def snake_loop():
                 if event.key == pygame.K_r:
                     main_game = Main()  # Restarting the game if the input is r
                 elif event.key == pygame.K_ESCAPE:
-                    main_game.close_game()
+                    main_game.close_game()  # Closing the game if escape is pressed
 
         screen.fill((175, 215, 70))  # Creating a tuple with rgb values (out of 255) to define the color of the screen
         main_game.draw_elements()

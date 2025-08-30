@@ -18,7 +18,7 @@ class Button:
         else:
             self.sound = sound
 
-        if self.image is None:
+        if self.image is None:  # Setting up the image for the button as the text if there is none
             self.image = self.text
         # Defining a rectangle for the background of the button
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
@@ -34,12 +34,12 @@ class Button:
         # Checking if the given position (x and y coordinates) is within the rect borders
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
             if self.sound is not None:
-                self.sound.play()  # Playing the game over sound
-            return True
+                self.sound.play()  # Playing the button's sound if it is clicked
+            return True  # Returning a value to confirm whether the button was clicked or not
         return False
 
     def change_color(self, position):
-        # Checking if the mouse is hovering on the text
+        # Checking if the mouse is hovering on the text and changing the button's color if so
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
             self.text = self.font.render(self.text_input, True, self.hovering_color)
         else:

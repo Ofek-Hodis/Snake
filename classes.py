@@ -183,7 +183,7 @@ class Main:
             self.check_collision()  # Checking for collision with an apple
             self.check_fail()  # Checking if the player lost
 
-    def draw_elements(self):  # Method to draw the fruit and snake
+    def draw_elements(self):  # Method to draw the fruit, snake and the score
         if self.game_active:
             self.draw_grass()
             self.fruit.draw_fruit()
@@ -228,7 +228,7 @@ class Main:
                         pygame.draw.rect(screen, grass_color, grass_rect)
             else:
                 for col in range(cell_number):  # Going column by column and coloring the odd grid parts
-                    if col % 2 != 0:
+                    if col % 2 != 0:  # Choosing every other column (odd numbers)
                         grass_rect = pygame.Rect(col*cell_size, row*cell_size, cell_size, cell_size)
                         pygame.draw.rect(screen, grass_color, grass_rect)
 
