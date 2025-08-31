@@ -1,6 +1,6 @@
 import pygame  # Importing pygame for the creation of the game
 import sys  # Importing sys to use the exit function to halt the code
-import random  # Importing random to generate apple coordinates
+import random  # Importing random to generate fruit coordinates
 from pygame.math import Vector2  # Importing the specific function to facilitate code writing
 
 cell_size = 30  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
@@ -161,8 +161,6 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
         fruit_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y) * cell_size, cell_size,
                                  cell_size)
         screen.blit(apple, fruit_rect)  # Placing the image where the rectangle is
-        # Drawing a rectangle on screen, with an rgb tuple for colors, using the previously created rect
-        # pygame.draw.rect(screen, (200, 40, 10), fruit_rect)
 
     def randomize(self):  # When apple is eaten we will randomize new coordinates for another apple
         self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
