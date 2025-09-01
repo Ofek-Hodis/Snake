@@ -2,6 +2,7 @@ import pygame  # Importing pygame for the creation of the game
 import sys  # Importing sys to use the exit function to halt the code
 import random  # Importing random to generate apple coordinates
 from pygame.math import Vector2  # Importing the specific function to facilitate code writing
+from datetime import datetime  # Imported for debugging purposes
 
 cell_size = 30  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
 cell_number = 25  # Defining the amount of cells in the simulated grid
@@ -101,9 +102,7 @@ class Snake:
                             previous_block_direction.y == 1 and next_block_direction.x == -1):
                         screen.blit(self.body_bl, block_rect)
 
-    def update_head_graphics(self):
-
-        # Based on the direction of the snake, choosing the relevant head image
+    def update_head_graphics(self): # # Based on the direction of the snake, choosing the relevant head image
         if self.direction == Vector2(1, 0):
             self.head = self.head_right
         elif self.direction == Vector2(-1, 0):
@@ -142,7 +141,7 @@ class Snake:
             self.body = body_copy
 
     def add_block(self):
-        self.new_block = True  # Changing this variable to make the snake linger when running move_snake()
+        self.new_block = True  # Changing this variable to make the snake longer when running move_snake()
 
 
 class Fruit:  # Defining a class for the fruits that make the snake grow
@@ -160,8 +159,6 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
         fruit_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y) * cell_size, cell_size,
                                  cell_size)
         screen.blit(self.image, fruit_rect)  # Placing the image where the rectangle is
-        # Drawing a rectangle on screen, with an rgb tuple for colors, using the previously created rect
-        # pygame.draw.rect(screen, (200, 40, 10), fruit_rect)
 
     def randomize(self, snake1 = Snake(), snake2 = Snake(), twoplayers = False):  # When apple is eaten we will randomize new coordinates for another apple
         while True:
@@ -184,16 +181,15 @@ class Main:
         self.game_active = True  # Controlling game state
         self.two_players = twoplayers
 
-        # Clear screen right when a new game is created
-
     def update(self):  # Method to move the snake when the game updates
         if self.game_active:
             self.snake.move_snake()  # Moving the snake every update
+            if self.two_players:  # Moving the second snake before checking for collisions to keep the game updated
+                self.snake2.move_snake()
             self.check_collision()  # Checking for collision with an apple
             self.check_fail()  # Checking if the player lost
             if self.two_players:
-                self.snake2.move_snake()
-                self.check_fail_two()
+                self.check_fail_two()  # Checking if the second snake fails
 
     def draw_elements(self):  # Method to draw the fruit and snake
         if self.game_active:
@@ -210,12 +206,12 @@ class Main:
             self.fruit.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
             self.snake.add_block()  # Making the snake longer
             self.snake.play_eat_sound()  # Playing sound of apple eaten
+
         if self.two_players:
             if self.fruit2.position == self.snake2.body[0]:
                 self.fruit2.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
                 self.snake2.add_block()  # Making the snake longer
                 self.snake2.play_eat_sound()  # Playing sound of apple eaten
-
 
     def check_fail(self):  # Checking if the player failed and the game should be over
         # The cell number is are 0 based, so we subtract 1
