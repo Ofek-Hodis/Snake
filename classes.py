@@ -171,6 +171,8 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
 class Main:
     def __init__(self):
         self.snake = Snake()
+        self.powerup = Powerup()
+        self.is_powerup = False
         self.fruit = Fruit()
         self.game_active = True  # Controlling game state
         # Clear screen right when a new game is created
@@ -188,6 +190,10 @@ class Main:
             self.snake.draw_snake()
             self.draw_score()
 
+    def draw_powerup(self):
+        self.speedchange.draw_powerup()  # Drawing the power up
+        self.is_powerup = True  # Saving the fact that there is a pwoerup on the board
+
     def check_collision(self):
         if self.fruit.position == self.snake.body[0]:
             self.fruit.randomize()  # Changing location of the fruit
@@ -197,6 +203,10 @@ class Main:
         for block in self.snake.body[1:]:  # Checking if the apple is on the body
             if block == self.fruit.position:
                 self.fruit.randomize()
+
+        if self.is_powerup:
+            if self.speedchange.position == self.snake.body[0]:
+                pass
 
     def check_fail(self):  # Checking if the player failed and the game should be over
         # The cell number is are 0 based, so we subtract 1
@@ -239,4 +249,26 @@ class Main:
         score_rect = score_surface.get_rect(center=(score_x, score_y))
 
         screen.blit(score_surface, score_rect)
+
+
+class Powerup:  # Defining a class for the fruits that make the snake grow
+    def __init__(self, image="Images/Speedup.PNG", type=random.randint(0, 1)):
+        # Setting up variables with x,y coordinates and the position
+        self.x = 0
+        self.y = 0  # Defining random y position
+        self.position = Vector2(self.x, self.y)
+        self.randomize()  # Randomizing the position of the apple
+        self.type = type
+        self.img = image
+
+    def draw_powerup(self):  # Method to draw the powerup
+        powerup_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y) * cell_size, cell_size,
+                                  cell_size)
+        screen.blit(self.img, powerup_rect)  # Placing the image where the rectangle is
+
+    def randomize(self):  # When apple is eaten we will randomize new coordinates for another apple
+        self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
+        self.y = random.randint(0, cell_number - 1)  # Defining random y position
+        self.position = Vector2(self.x, self.y)
+
 
