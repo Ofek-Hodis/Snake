@@ -1,6 +1,6 @@
 import pygame  # Importing pygame for the creation of the game
 import sys  # Importing sys to use the exit function to halt the code
-import random  # Importing random to generate apple coordinates
+import random  # Importing random to generate fruit coordinates
 from pygame.math import Vector2  # Importing the specific function to facilitate code writing
 from datetime import datetime  # Imported for debugging purposes
 
@@ -158,7 +158,8 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
         # Creating a rectangle with given positions, width and height
         fruit_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y) * cell_size, cell_size,
                                  cell_size)
-        screen.blit(self.image, fruit_rect)  # Placing the image where the rectangle is
+        screen.blit(self.image, fruit_rect)  # Placing the image where the rectangle i
+
 
     def randomize(self, snake1 = Snake(), snake2 = Snake(), twoplayers = False):  # When apple is eaten we will randomize new coordinates for another apple
         while True:
@@ -191,7 +192,7 @@ class Main:
             if self.two_players:
                 self.check_fail_two()  # Checking if the second snake fails
 
-    def draw_elements(self):  # Method to draw the fruit and snake
+    def draw_elements(self):  # Method to draw the fruit, snake and the score
         if self.game_active:
             self.draw_grass()
             self.fruit.draw_fruit()
@@ -267,7 +268,7 @@ class Main:
                         pygame.draw.rect(screen, grass_color, grass_rect)
             else:
                 for col in range(cell_number):  # Going column by column and coloring the odd grid parts
-                    if col % 2 != 0:
+                    if col % 2 != 0:  # Choosing every other column (odd numbers)
                         grass_rect = pygame.Rect(col*cell_size, row*cell_size, cell_size, cell_size)
                         pygame.draw.rect(screen, grass_color, grass_rect)
 
