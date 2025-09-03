@@ -2,21 +2,19 @@ import pygame  # Importing pygame for the creation of the game
 import sys  # Importing sys to use the exit function to halt the code
 import random  # Importing random to generate fruit coordinates
 from pygame.math import Vector2  # Importing the specific function to facilitate code writing
+from datetime import datetime  # Imported for debugging purposes
 
 cell_size = 30  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
 cell_number = 25  # Defining the amount of cells in the simulated grid
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 
-# Taking an apple photo and converting it to a format pygame can handle easily
-apple = pygame.image.load('Images/apple.png').convert_alpha()
-apple = pygame.transform.scale(apple, (cell_size, cell_size))  # Conversion of the photo to size of one cell
 game_font = pygame.font.Font('Fonts/Cute Dino.ttf', 25)  # Choosing the font for the score
 
 
 class Snake:
-    def __init__(self):
-        self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]  # Defining the starting position of the snake
-        self.direction = Vector2(1, 0)
+    def __init__(self, position = (5, 4, 3), height = 5, direction = 1):
+        self.body = [Vector2(position[0], height), Vector2(position[1], height), Vector2(position[2], height)]  # Defining the starting position of the snake
+        self.direction = Vector2(direction, 0)
         self.next_direction = self.direction  # Set initial next direction
         self.new_block = False  # Defining a variable to see if we want to add a block to the snake
 
@@ -104,9 +102,7 @@ class Snake:
                             previous_block_direction.y == 1 and next_block_direction.x == -1):
                         screen.blit(self.body_bl, block_rect)
 
-    def update_head_graphics(self):
-
-        # Based on the direction of the snake, choosing the relevant head image
+    def update_head_graphics(self): # # Based on the direction of the snake, choosing the relevant head image
         if self.direction == Vector2(1, 0):
             self.head = self.head_right
         elif self.direction == Vector2(-1, 0):
@@ -145,14 +141,17 @@ class Snake:
             self.body = body_copy
 
     def add_block(self):
-        self.new_block = True  # Changing this variable to make the snake linger when running move_snake()
+        self.new_block = True  # Changing this variable to make the snake longer when running move_snake()
 
 
 class Fruit:  # Defining a class for the fruits that make the snake grow
-    def __init__(self):
+    def __init__(self, img='Images/apple.png'):
         # Setting up variables with x,y coordinates and the position
         self.x = 0
         self.y = 0  # Defining random y position
+        self.image = pygame.image.load(img).convert_alpha()  # Setting up the apple image
+        # Conversion of the photo to size of one cell
+        self.image = pygame.transform.scale(self.image, (cell_size, cell_size))
         self.position = Vector2(self.x, self.y)
         self.randomize()  # Randomizing the position of the apple
 
@@ -160,26 +159,86 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
         # Creating a rectangle with given positions, width and height
         fruit_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y) * cell_size, cell_size,
                                  cell_size)
-        screen.blit(apple, fruit_rect)  # Placing the image where the rectangle is
+        screen.blit(self.image, fruit_rect)  # Placing the image where the rectangle i
 
-    def randomize(self):  # When apple is eaten we will randomize new coordinates for another apple
-        self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
-        self.y = random.randint(0, cell_number - 1)  # Defining random y position
+    def randomize(self, snake1=Snake(), snake2=Snake(), twoplayers=False):  # When apple is eaten we will randomize new coordinates for another apple
+        while True:
+            self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
+            self.y = random.randint(0, cell_number - 1)  # Defining random y position
+            self.position = Vector2(self.x, self.y)
+            if twoplayers:
+                if self.position not in snake1.body and self.position not in snake2.body:
+                    break
+            elif self.position not in snake1.body:
+                break
+
+
+class Powerup:  # Defining a class for the fruits that make the snake grow
+    def __init__(self, img='Images/apple.png'):
+        # Setting up variables with x,y coordinates and the position
+        self.x = 0
+        self.y = 0  # Defining random y position
+        self.image = pygame.image.load(img).convert_alpha()  # Setting up the apple image
+        # Conversion of the photo to size of one cell
+        self.image = pygame.transform.scale(self.image, (cell_size, cell_size))
         self.position = Vector2(self.x, self.y)
+        self.randomize()  # Randomizing the position of the apple
+        self.is_powerup = False
+
+    # Method to check if the powerup should be drawed and draw it if so
+    def draw_check(self, time):
+        # Every 5 seconds of game time (if there is no powerup) giving a 1 in 4 chance to spawn a power up
+        if time % 5 == 0 and not self.is_powerup:
+            spawn_chance = random.randint(0, 3)
+            if spawn_chance == 0:
+                self.draw_powerup()
+                return True
+        return False
+
+    def draw_powerup(self):  # Method to draw the powerup
+        powerup_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y) * cell_size, cell_size,
+                                   cell_size)
+        screen.blit(self.image, powerup_rect)  # Placing the image where the rectangle is
+        self.is_powerup = True
+
+    def randomize(self, snake1=Snake(), snake2=Snake(),
+                  twoplayers=False):  # When apple is eaten we will randomize new coordinates for another apple
+        while True:
+            self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
+            self.y = random.randint(0, cell_number - 1)  # Defining random y position
+            self.position = Vector2(self.x, self.y)
+            if twoplayers:
+                if self.position not in snake1.body and self.position not in snake2.body:
+                    break
+            elif self.position not in snake1.body:
+                break
+
+    def get_effect(self):
+        if self.type == 0:
+            return 50
+        elif self.type == 1:
+            return 200
 
 
 class Main:
-    def __init__(self):
+    def __init__(self, twoplayers=False):
         self.snake = Snake()
+        self.snake2 = Snake((19, 20, 21), 20, -1)  # Changing position for the second snake
         self.fruit = Fruit()
+        self.fruit2 = Fruit('Images/orange.png')  # Different photo for the second fruit
         self.game_active = True  # Controlling game state
-        # Clear screen right when a new game is created
+        self.two_players = twoplayers  # Storing if the game is in two player mode or not
+        self.power_up = Powerup()  # Creating a power up
 
     def update(self):  # Method to move the snake when the game updates
         if self.game_active:
             self.snake.move_snake()  # Moving the snake every update
+            if self.two_players:  # Moving the second snake before checking for collisions to keep the game updated
+                self.snake2.move_snake()
             self.check_collision()  # Checking for collision with an apple
             self.check_fail()  # Checking if the player lost
+            if self.two_players:
+                self.check_fail_two()  # Checking if the second snake fails
 
     def draw_elements(self):  # Method to draw the fruit, snake and the score
         if self.game_active:
@@ -187,16 +246,21 @@ class Main:
             self.fruit.draw_fruit()
             self.snake.draw_snake()
             self.draw_score()
+        if self.two_players:
+            self.snake2.draw_snake()
+            self.fruit2.draw_fruit()
 
     def check_collision(self):
         if self.fruit.position == self.snake.body[0]:
-            self.fruit.randomize()  # Changing location of the fruit
+            self.fruit.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
             self.snake.add_block()  # Making the snake longer
             self.snake.play_eat_sound()  # Playing sound of apple eaten
 
-        for block in self.snake.body[1:]:  # Checking if the apple is on the body
-            if block == self.fruit.position:
-                self.fruit.randomize()
+        if self.two_players:
+            if self.fruit2.position == self.snake2.body[0]:
+                self.fruit2.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
+                self.snake2.add_block()  # Making the snake longer
+                self.snake2.play_eat_sound()  # Playing sound of apple eaten
 
     def check_fail(self):  # Checking if the player failed and the game should be over
         # The cell number is are 0 based, so we subtract 1
@@ -209,6 +273,32 @@ class Main:
             if block == self.snake.body[0]:
                 print("Snake collided with itself!")
                 self.game_active = False  # Changing to false so the game stops running
+
+
+    def check_fail_two(self):
+        # Checking if snake 2 is out of bounds
+        if (not 0 <= self.snake2.body[0].x < cell_number) or (not 0 <= self.snake2.body[0].y < cell_number):
+            print("Snake 2 out of bounds!")
+            self.game_active = False  # Changing to false so the game stops running
+
+        # Checking if snake2 collided with itself
+        for block in self.snake2.body[1:]:
+            if block == self.snake2.body[0]:
+                print("Snake 2 collided with itself!")
+                self.game_active = False  # Changing to false so the game stops running
+
+        # Checking if snake1 collided with snake2
+        for block in self.snake.body[1:]:
+            if block == self.snake2.body[0]:
+                print("Snake 2 collided with snake 1!")
+                self.game_active = False  # Changing to false so the game stops running
+
+        # Checking if snake2 collided with snake1
+        for block in self.snake2.body[1:]:
+            if block == self.snake.body[0]:
+                print("Snake 1 collided with snake 2!")
+                self.game_active = False  # Changing to false so the game stops running
+
 
     @staticmethod  # The method doesn't use self
     def close_game():  # Method to quit the game
@@ -231,7 +321,10 @@ class Main:
                         pygame.draw.rect(screen, grass_color, grass_rect)
 
     def draw_score(self):
-        score_text = str(len(self.snake.body) - 3)  # Taking the score based on length acquired (length starts at 3)
+        if not self.two_players:
+            score_text = str(len(self.snake.body) - 3)  # Taking the score based on length acquired (length starts at 3)
+        else:
+            score_text = str(len(self.snake.body)-3 + len(self.snake2.body) - 3)
         score_surface = game_font.render(score_text, True, (56, 74, 12))
         score_x = int(cell_size * cell_number - 30)  # Defining the coordinates for the score
         score_y = int(cell_size * cell_number - 30)
@@ -239,4 +332,5 @@ class Main:
         score_rect = score_surface.get_rect(center=(score_x, score_y))
 
         screen.blit(score_surface, score_rect)
+
 

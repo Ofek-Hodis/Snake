@@ -13,13 +13,32 @@ def get_high_score():
     with open("Data/high_score.json", "r") as f:  # Opening the file in read mode to get the top score
         data = json.load(f)  # Turning the data to a Python dictionary
 
-    high_score = data["high_score"]  # Saving the data from JSON file to a variable
+    high_score = data["single_high_score"]  # Saving the data from JSON file to a variable
+    return high_score
+
+
+def get_high_score_twoplayer():
+    with open("Data/high_score.json", "r") as f:  # Opening the file in read mode to get the top score
+        data = json.load(f)  # Turning the data to a Python dictionary
+
+    high_score = data["two_player_high_score"]  # Saving the data from JSON file to a variable
     return high_score
 
 
 def store_high_score(new_score):
-    with open("Data/high_score.json", "w") as f:  # Opening the file in write mode to update the score
-        json.dump({"high_score": new_score}, f)  # Converting the text to JSON form and writing it into the file
+    with open("Data/high_score.json", "r+") as f:  # Opening the file in read & write mode to update the score
+        data = json.load(f)  # Turning the data to a Python dictionary
+        two_score = data["two_player_high_score"]  # Storing two player high score
+        f.seek(0)  # Returning the pointer to the first place of the array
+        # Converting the text to JSON form and writing it into the file
+        json.dump({"single_high_score": new_score, "two_player_high_score": two_score}, f)
 
 
+def store_high_score_twoplayer(new_score):
+    with open("Data/high_score.json", "r+") as f:  # Opening the file in read & write mode to update the score
+        data = json.load(f)  # Turning the data to a Python dictionary
+        single_score = data["single_high_score"]  # Storing two player high score
+        f.seek(0)
+        # Converting the text to JSON form and writing it into the file
+        json.dump({"single_high_score": single_score, "two_player_high_score": new_score}, f)
 

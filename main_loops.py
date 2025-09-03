@@ -2,7 +2,10 @@ import pygame  # Importing pygame for the creation of the game
 import sys  # Importing sys to use the exit function to halt the code
 from pygame.math import Vector2  # Importing the specific function to facilitate code writing
 from button import Button  # Importing button class
-from support_funcs import get_high_score, store_high_score  # Importing functions to store and get high score
+import random  # Importing random to generate fruit coordinates
+
+# Importing functions to store and get high score
+from support_funcs import get_high_score, get_high_score_twoplayer, store_high_score, store_high_score_twoplayer
 
 # Code to set up delay in sound so that it fits the actions
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -17,7 +20,7 @@ screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_si
 clock = pygame.time.Clock()  # Creating a clock object to define the speed of the game
 SCREEN_UPDATE = pygame.USEREVENT  # Creating an event
 # Game speed controls:
-pygame.time.set_timer(SCREEN_UPDATE, 500)  # Setting a timer to trigger the event (milliseconds)
+pygame.time.set_timer(SCREEN_UPDATE, 140)  # Setting a timer to trigger the event (milliseconds)
 
 gameover_sound_played = False  # Defining a variable to prevent replay of gameover sound
 font = 'Fonts/Cute Dino.ttf'
@@ -87,7 +90,7 @@ def menu_loop():
         pygame.display.update()
 
 
-def gameover_actions(score):
+def gameover_actions(score, main):
     global gameover_sound_played  # Letting the function know I use the variable from outside of it
     if not gameover_sound_played:
         # Playing game over sound
@@ -95,22 +98,26 @@ def gameover_actions(score):
         losing_sound.set_volume(0.15)  # Lowering the volume of the sound
         losing_sound.play()  # Playing the game over sound
         gameover_sound_played = True
-
-    top_score = get_high_score()
+    if main.two_players:
+        top_score = get_high_score_twoplayer()
+    else:
+        top_score = get_high_score()
     if score > top_score:  # Returning a message to be displayed based on user's performance
-        store_high_score(score)
+        if main.two_players:
+            store_high_score_twoplayer(score)
+        else:
+            store_high_score(score)
         return "Congratulations! You broke your high score!"
     elif score == top_score:
         return "You almost broke your high score! You didn't tho."
     return ""
 
 
-def gamedone_loop(score, time):
-    main_game = Main()
+def gamedone_loop(score, time, main):
     global gameover_sound_played  # Telling the function to use the global variable
     global font
 
-    score_msg = gameover_actions(score)  # Storing if the player broke the high score or not
+    score_msg = gameover_actions(score, main)  # Storing if the player broke the high score or not
 
     while True:
         screen.fill((20, 20, 20))
@@ -124,7 +131,10 @@ def gamedone_loop(score, time):
         text_draw("Final Score: " + str(score), score_position, font, 30, (175, 175, 175), screen)
 
         high_score_position = (cell_number / 2 * cell_size), (8 * cell_size)  # Defining position for the text
-        high_score = get_high_score()  # Getting high score from JSON file
+        if main.two_players:
+            high_score = get_high_score_twoplayer()
+        else:
+            high_score = get_high_score()  # Getting high score from JSON file
         # Using a function to draw the high score
         text_draw("High Score: " + str(high_score), high_score_position, font, 30, (175, 175, 175), screen)
 
@@ -172,25 +182,25 @@ def gamedone_loop(score, time):
 
         for event in pygame.event.get():  # When starting the game we check for all events
             if event.type == pygame.QUIT:  # If the user closes the window, quit the program
-                main_game.close_game()  # Closing game
+                main.close_game()  # Closing game
             if event.type == pygame.KEYDOWN:  # Checking for user input and defining direction by the key
                 if event.key == pygame.K_r:
                     gameover_sound_played = False  # Resetting the variable so the sound will play
                     main_game = Main()  # Restarting the game if the input is r
                     snake_loop()
                 elif event.key == pygame.K_ESCAPE:
-                    main_game.close_game()  # Closing game
+                    main.close_game()  # Closing game
             if event.type == pygame.MOUSEBUTTONDOWN:  # Checking if the player pressed a button
                 if single_button.check_input(pygame.mouse.get_pos()):
                     gameover_sound_played = False  # Resetting the variable so the sound will play
-                    main_game = Main()  # Restarting the game if the input is r
+                    main = Main()  # Restarting the game if the input is r
                     snake_loop()
                 elif two_button.check_input(pygame.mouse.get_pos()):
                     gameover_sound_played = False  # Resetting the variable so the sound will play
-                    main_game = Main()  # Restarting the game if the input is r
+                    main = Main()  # Restarting the game if the input is r
                     twoplayer_loop()
                 elif quit_button.check_input(pygame.mouse.get_pos()):  # Quitting if button was pressed
-                    main_game.close_game()  # Closing game
+                    main.close_game()  # Closing game
 
         pygame.display.update()
 
@@ -225,11 +235,19 @@ def snake_loop():
                 elif event.key == pygame.K_ESCAPE:
                     main_game.close_game()
 
+        # Storing time elapsed to calculate whether powerup should be spawned
+        time_elapsed = (pygame.time.get_ticks() - time_start) / 1000
+        draw_power_up = main_game.power_up.draw_check(time_elapsed)
+        if draw_power_up:
+            power_up_time = (pygame.time.get_ticks() - time_start) / 1000
+        else:
+            main_game.power_up.draw_powerup()
+
         screen.fill((175, 215, 70))  # Creating a tuple with rgb values (out of 255) to define the color of the screen
         main_game.draw_elements()
+
         if not main_game.game_active:  # Updating the screen
-            time_elapsed = pygame.time.get_ticks() - time_start
-            gamedone_loop(len(main_game.snake.body) - 3, time_elapsed)  # Calculating the final score and time
+            gamedone_loop(len(main_game.snake.body) - 3, time_elapsed, main_game)  # Calculating the final score and time
             break
 
         pygame.display.update()
@@ -281,8 +299,10 @@ def twoplayer_loop():
         screen.fill((175, 215, 70))
         main_game.draw_elements()
         if not main_game.game_active:  # Updating the screen
+            # Calculating final score and time for two players
             time_elapsed = pygame.time.get_ticks() - time_start
-            gamedone_loop(len(main_game.snake.body) - 3, time_elapsed)  # Calculating the final score and time
+            score = len(main_game.snake.body) - 3 + len(main_game.snake2.body) - 3
+            gamedone_loop(score, time_elapsed, main_game)
             break
 
         pygame.display.update()
