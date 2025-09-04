@@ -12,46 +12,55 @@ game_font = pygame.font.Font('Fonts/Cute Dino.ttf', 25)  # Choosing the font for
 
 
 class Snake:
-    def __init__(self, position = (5, 4, 3), height = 5, direction = 1):
-        self.body = [Vector2(position[0], height), Vector2(position[1], height), Vector2(position[2], height)]  # Defining the starting position of the snake
+    def __init__(self, position=(5, 4, 3), height=5, direction=1, snake_number=1):
+        # Defining the starting position of the snake
+        self.body = [Vector2(position[0], height), Vector2(position[1], height), Vector2(position[2], height)]
         self.direction = Vector2(direction, 0)
-        self.next_direction = self.direction  # Set initial next direction
+        self.next_direction = self.direction
         self.new_block = False  # Defining a variable to see if we want to add a block to the snake
+        self.number = snake_number
 
+        # Choosing image folder fitting to snake number
+        if self.number == 1:
+            snake_folder = 'snake1'
+        elif self.number == 2:
+            snake_folder = 'snake2'
+
+        # Using f string to format the folder name
         # Defining head locations to relevant photos and adjusting the size to that of one cell
-        self.head_up = pygame.image.load('Images/head_up.png').convert_alpha()
+        self.head_up = pygame.image.load(f'Images/{snake_folder}/head_up.png').convert_alpha()
         self.head_up = pygame.transform.scale(self.head_up, (cell_size, cell_size))
-        self.head_down = pygame.image.load('Images/head_down.png').convert_alpha()
+        self.head_down = pygame.image.load(f'Images/{snake_folder}/head_down.png').convert_alpha()
         self.head_down = pygame.transform.scale(self.head_down, (cell_size, cell_size))
-        self.head_right = pygame.image.load('Images/head_right.png').convert_alpha()
+        self.head_right = pygame.image.load(f'Images/{snake_folder}/head_right.png').convert_alpha()
         self.head_right = pygame.transform.scale(self.head_right, (cell_size, cell_size))
-        self.head_left = pygame.image.load('Images/head_left.png').convert_alpha()
+        self.head_left = pygame.image.load(f'Images/{snake_folder}/head_left.png').convert_alpha()
         self.head_left = pygame.transform.scale(self.head_left, (cell_size, cell_size))
 
         # Defining tail locations to relevant photos and adjusting the size to that of one cell
-        self.tail_up = pygame.image.load('Images/tail_up.png').convert_alpha()
+        self.tail_up = pygame.image.load(f'Images/{snake_folder}/tail_up.png').convert_alpha()
         self.tail_up = pygame.transform.scale(self.tail_up, (cell_size, cell_size))
-        self.tail_down = pygame.image.load('Images/tail_down.png').convert_alpha()
+        self.tail_down = pygame.image.load(f'Images/{snake_folder}/tail_down.png').convert_alpha()
         self.tail_down = pygame.transform.scale(self.tail_down, (cell_size, cell_size))
-        self.tail_right = pygame.image.load('Images/tail_right.png').convert_alpha()
+        self.tail_right = pygame.image.load(f'Images/{snake_folder}/tail_right.png').convert_alpha()
         self.tail_right = pygame.transform.scale(self.tail_right, (cell_size, cell_size))
-        self.tail_left = pygame.image.load('Images/tail_left.png').convert_alpha()
+        self.tail_left = pygame.image.load(f'Images/{snake_folder}/tail_left.png').convert_alpha()
         self.tail_left = pygame.transform.scale(self.tail_left, (cell_size, cell_size))
 
         # Defining body locations to relevant photos and adjusting the size to that of one cell
-        self.body_vertical = pygame.image.load('Images/body_vertical.png').convert_alpha()
+        self.body_vertical = pygame.image.load(f'Images/{snake_folder}/body_vertical.png').convert_alpha()
         self.body_vertical = pygame.transform.scale(self.body_vertical, (cell_size, cell_size))
-        self.body_horizontal = pygame.image.load('Images/body_horizontal.png').convert_alpha()
+        self.body_horizontal = pygame.image.load(f'Images/{snake_folder}/body_horizontal.png').convert_alpha()
         self.body_horizontal = pygame.transform.scale(self.body_horizontal, (cell_size, cell_size))
 
         # Defining curved bodyparts locations to relevant photos and adjusting the size to that of one cell
-        self.body_tr = pygame.image.load('Images/body_tr.png').convert_alpha()
+        self.body_tr = pygame.image.load(f'Images/{snake_folder}/body_tr.png').convert_alpha()
         self.body_tr = pygame.transform.scale(self.body_tr, (cell_size, cell_size))
-        self.body_tl = pygame.image.load('Images/body_tl.png').convert_alpha()
+        self.body_tl = pygame.image.load(f'Images/{snake_folder}/body_tl.png').convert_alpha()
         self.body_tl = pygame.transform.scale(self.body_tl, (cell_size, cell_size))
-        self.body_br = pygame.image.load('Images/body_br.png').convert_alpha()
+        self.body_br = pygame.image.load(f'Images/{snake_folder}/body_br.png').convert_alpha()
         self.body_br = pygame.transform.scale(self.body_br, (cell_size, cell_size))
-        self.body_bl = pygame.image.load('Images/body_bl.png').convert_alpha()
+        self.body_bl = pygame.image.load(f'Images/{snake_folder}/body_bl.png').convert_alpha()
         self.body_bl = pygame.transform.scale(self.body_bl, (cell_size, cell_size))
 
         self.eat_sound = pygame.mixer.Sound('Sounds/apple_eaten.wav')  # Adding apple sound
@@ -223,7 +232,7 @@ class Powerup:  # Defining a class for the fruits that make the snake grow
 class Main:
     def __init__(self, twoplayers=False):
         self.snake = Snake()
-        self.snake2 = Snake((19, 20, 21), 20, -1)  # Changing position for the second snake
+        self.snake2 = Snake((19, 20, 21), 20, -1, 2)  # Changing position for the second snake
         self.fruit = Fruit()
         self.fruit2 = Fruit('Images/orange.png')  # Different photo for the second fruit
         self.game_active = True  # Controlling game state
