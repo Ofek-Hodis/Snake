@@ -1,14 +1,14 @@
 import pygame  # Importing pygame for the creation of the game
-import sys  # Importing sys to use the exit function to halt the code
-import random  # Importing random to generate fruit coordinates
-from pygame.math import Vector2  # Importing the specific function to facilitate code writing
-from datetime import datetime  # Imported for debugging purposes
+import sys
+import random
+from pygame.math import Vector2
 
 cell_size = 30  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
 cell_number = 25  # Defining the amount of cells in the simulated grid
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 
-game_font = pygame.font.Font('Fonts/Cute Dino.ttf', 25)  # Choosing the font for the score
+# Defining font that will be used for menus in the game
+game_font = pygame.font.Font('Fonts/Cute Dino.ttf', 25)
 
 
 class Snake:
@@ -154,7 +154,7 @@ class Snake:
 
 
 class Fruit:  # Defining a class for the fruits that make the snake grow
-    def __init__(self, img='Images/apple.png'):
+    def __init__(self, img='Images/Fruit/apple.png'):
         # Setting up variables with x,y coordinates and the position
         self.x = 0
         self.y = 0  # Defining random y position
@@ -170,7 +170,7 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
                                  cell_size)
         screen.blit(self.image, fruit_rect)  # Placing the image where the rectangle i
 
-    def randomize(self, snake1=Snake(), snake2=Snake(), twoplayers=False):  # When apple is eaten we will randomize new coordinates for another apple
+    def randomize(self, snake1=Snake(), snake2=Snake(), twoplayers=False):
         while True:
             self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
             self.y = random.randint(0, cell_number - 1)  # Defining random y position
@@ -183,7 +183,7 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
 
 
 class Powerup:  # Defining a class for the fruits that make the snake grow
-    def __init__(self, img='Images/apple.png'):
+    def __init__(self, img='Images/Powerups/Speedup.png'):
         # Setting up variables with x,y coordinates and the position
         self.x = 0
         self.y = 0  # Defining random y position
@@ -194,7 +194,7 @@ class Powerup:  # Defining a class for the fruits that make the snake grow
         self.randomize()  # Randomizing the position of the apple
         self.is_powerup = False
 
-    # Method to check if the powerup should be drawed and draw it if so
+    # Method to check if the powerup should be drawn and draw it if so
     def draw_check(self, time):
         # Every 5 seconds of game time (if there is no powerup) giving a 1 in 4 chance to spawn a power up
         if time % 5 == 0 and not self.is_powerup:
@@ -234,7 +234,7 @@ class Main:
         self.snake = Snake()
         self.snake2 = Snake((19, 20, 21), 20, -1, 2)  # Changing position for the second snake
         self.fruit = Fruit()
-        self.fruit2 = Fruit('Images/orange.png')  # Different photo for the second fruit
+        self.fruit2 = Fruit('Images/Fruit/orange.png')  # Different photo for the second fruit
         self.game_active = True  # Controlling game state
         self.two_players = twoplayers  # Storing if the game is in two player mode or not
         self.power_up = Powerup()  # Creating a power up

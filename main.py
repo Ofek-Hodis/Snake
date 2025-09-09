@@ -12,15 +12,14 @@ pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()  # Initiating pygame
 
 # To import Main we must initiate pygame firstly
-from classes import cell_number, cell_size, Main  # Imported variables and the Main class to run the main code
+from main_classes import cell_number, cell_size, Main  # Imported variables and the Main class to run the main code
 from support_funcs import text_draw
 
 # Creating the window and defining the width and height
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 clock = pygame.time.Clock()  # Creating a clock object to define the speed of the game
 SCREEN_UPDATE = pygame.USEREVENT  # Creating an event
-# Game speed controls:
-pygame.time.set_timer(SCREEN_UPDATE, 140)  # Setting a timer to trigger the event (milliseconds)
+pygame.time.set_timer(SCREEN_UPDATE, 140)  # Setting a timer (milliseconds) to trigger the event (game speed)
 
 gameover_sound_played = False  # Defining a variable to prevent replay of gameover sound
 font = 'Fonts/Cute Dino.ttf'
@@ -70,13 +69,14 @@ def menu_loop():
 
         for event in pygame.event.get():  # When starting the game we check for all events
             if event.type == pygame.QUIT:  # If the user closes the window, quit the program
-                pygame.quit()  # Closing game
+                pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:  # Checking for user input and defining direction by the key
                 if event.key == pygame.K_ESCAPE:
-                    pygame.quit()  # Closing game
+                    pygame.quit()
                     sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:  # Checking if the player pressed a button
+            # Checking if the player pressed the mouse button and activating fitting button
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.check_input(pygame.mouse.get_pos()):
                     snake_loop()
                     break
@@ -84,7 +84,7 @@ def menu_loop():
                     twoplayer_loop()
                     break
                 elif quit_button.check_input(pygame.mouse.get_pos()):
-                    pygame.quit()  # Closing game
+                    pygame.quit()
                     sys.exit()
 
         pygame.display.update()
