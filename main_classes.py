@@ -3,7 +3,7 @@ import sys
 import random
 from pygame.math import Vector2
 
-cell_size = 25  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
+cell_size = 30  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
 cell_number = 25  # Defining the amount of cells in the simulated grid
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 
@@ -155,10 +155,9 @@ class Snake:
 
 class Fruit:  # Defining a class for the fruits that make the snake grow
     def __init__(self, img='Images/Fruit/apple.png'):
-        # Setting up variables with x,y coordinates and the position
         self.x = 0
-        self.y = 0  # Defining random y position
-        self.image = pygame.image.load(img).convert_alpha()  # Setting up the apple image
+        self.y = 0
+        self.image = pygame.image.load(img).convert_alpha()
         # Conversion of the photo to size of one cell
         self.image = pygame.transform.scale(self.image, (cell_size, cell_size))
         self.position = Vector2(self.x, self.y)
@@ -168,7 +167,7 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
         # Creating a rectangle with given positions, width and height
         fruit_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y) * cell_size, cell_size,
                                  cell_size)
-        screen.blit(self.image, fruit_rect)  # Placing the image where the rectangle i
+        screen.blit(self.image, fruit_rect)  # Placing the image where the rectangle is
 
     def randomize(self, snake1=Snake(), snake2=Snake(), twoplayers=False):
         while True:
@@ -182,40 +181,44 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
                 break
 
 
-class Powerup:  # Defining a class for the fruits that make the snake grow
-    def __init__(self, img='Images/Powerups/Speedup.PNG'):
-        # Setting up variables with x,y coordinates and the position
+class Powerup:
+    def __init__(self):
         self.x = 0
-        self.y = 0  # Defining random y position
-        self.type = 0  # Type 0 is speed up powerup, type 1 is slowdown powerup
-        self.image = pygame.image.load(img).convert_alpha()
+        self.y = 0
+        self.type = 0  # Type 0 is speedup powerup, type 1 is slowdown powerup
+        # Setting up default values for the image and sound of the powerup
+        self.image = pygame.image.load('Images/Powerups/Powerup.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (cell_size*1.05, cell_size*1.05))
+        self.sound = pygame.mixer.Sound('Sounds/speed_up.wav')
+        self.sound.set_volume(0.25)  # Lowering the volume of the sound
         self.position = Vector2(self.x, self.y)
-        self.randomize()  # Randomizing the position of the apple
+        self.randomize()
         self.is_drawn = False  # Tracking if there is currently a powerup drawn
         self.is_eaten = False  # Tracking if the powerup is eaten
 
-    # Method to check if the powerup should be drawn and draw it if so
+    # Method to check if the powerup should be drawn
     def draw_check(self):
         if not self.is_drawn:
-            spawn_chance = random.randint(0, 500)
+            spawn_chance = random.randint(0, 200)
             if spawn_chance == 0:
                 self.randomize()
                 self.type = random.randint(0, 1)  # Randomizing powerup type every time it's drawn
                 if self.type == 0:
-                    image = 'Images/Powerups/Speedup.PNG'
+                    sound = 'Sounds/speed_up.wav'
+                    self.sound = pygame.mixer.Sound(sound)
+                    self.sound.set_volume(0.25)  # Lowering the volume of the sound
                 elif self.type == 1:
-                    image = 'Images/Powerups/Slowdown.PNG'
-                self.image = pygame.image.load(image).convert_alpha()
-                self.image = pygame.transform.scale(self.image, (cell_size, cell_size))
+                    sound = 'Sounds/slow_down.wav'
+                    self.sound = pygame.mixer.Sound(sound)
+                    self.sound.set_volume(0.25)  # Lowering the volume of the sound
                 self.is_drawn = True
     def draw_powerup(self):  # Method to draw the powerup
         powerup_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y * cell_size), cell_size,
                                    cell_size)
-        print(self.position)
-        screen.blit(self.image, powerup_rect)  # Placing the image where the rectangle is
+        screen.blit(self.image, powerup_rect)
 
     def randomize(self, snake1=Snake(), snake2=Snake(),
-                  twoplayers=False):  # When apple is eaten we will randomize new coordinates for another apple
+                  twoplayers=False):
         while True:
             self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
             self.y = random.randint(0, cell_number - 1)  # Defining random y position
@@ -267,17 +270,17 @@ class Main:
         if self.power_up.is_drawn and self.power_up.position == self.snake.body[0]:
             self.power_up.is_drawn = False
             self.power_up.is_eaten = True
-            print("Powerup eaten")
+            self.power_up.sound.play()
 
         if self.two_players:
             if self.fruit2.position == self.snake2.body[0]:
                 self.fruit2.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
                 self.snake2.add_block()  # Making the snake longer
                 self.snake2.play_eat_sound()  # Playing sound of apple eaten
-            if self.two_players:
-                if self.power_up.is_drawn and self.power_up.position == self.snake2.body[0]:
-                    self.power_up.is_drawn = False
-                    self.power_up.is_eaten = True
+            if self.power_up.is_drawn and self.power_up.position == self.snake2.body[0]:
+                self.power_up.is_drawn = False
+                self.power_up.is_eaten = True
+                self.power_up.sound.play()
 
     def check_fail(self):  # Checking if the player failed and the game should be over
         # The cell number is are 0 based, so we subtract 1

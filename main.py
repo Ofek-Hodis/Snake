@@ -211,7 +211,7 @@ def snake_loop():
     power_up_start = 5  # Set to 5 to avoid activation before first spawn
     power_up_time = 10
     main_game.power_up.is_eaten = False  # Variable to tell the powerup's effects should be activated
-    is_normal_speed = False  # Variable to track if game speed has been changed
+    is_normal_speed = True  # Variable to track if game speed has been changed
 
     while True:  # Infinite loop I will break when I want the game to stop
         for event in pygame.event.get():  # When starting the game we check for all events
@@ -249,14 +249,11 @@ def snake_loop():
         main_game.draw_elements()
 
         if main_game.power_up.is_eaten:
-            print("eaten")
             power_up_start = pygame.time.get_ticks()  # Storing activation time for powerup
             if main_game.power_up.type == 0:  # Powerup effect according to it's type
                 pygame.time.set_timer(SCREEN_UPDATE, 90)
-                print("speed")
             elif main_game.power_up.type == 1:
                 pygame.time.set_timer(SCREEN_UPDATE, 220)
-                print("slow")
             main_game.power_up.is_eaten = False
             is_normal_speed = False
 
