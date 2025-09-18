@@ -139,7 +139,7 @@ def gamedone_loop(score, time, main):
         text_draw("High Score: " + str(high_score), high_score_position, font, 30, (175, 175, 175), screen)
 
         time_position = (cell_number / 2 * cell_size), (10 * cell_size)  # Defining position for the text
-        time_text = str(time/1000)  # Converting the time to seconds and then to as string
+        time_text = str(time)
         # Using a function to draw the time
         text_draw("Total time: " + time_text + " Seconds", time_position, font, 30, (175, 175, 175), screen)
 
@@ -208,6 +208,11 @@ def gamedone_loop(score, time, main):
 def snake_loop():
     main_game = Main()  # An object that will be used to follow the game and execute commands
     time_start = pygame.time.get_ticks()  # storing time at start to calculate run time
+    power_up_start = 5  # Set to 5 to avoid activation before first spawn
+    power_up_time = 10
+    main_game.power_up.is_eaten = False  # Variable to tell the powerup's effects should be activated
+    is_normal_speed = False  # Variable to track if game speed has been changed
+
     while True:  # Infinite loop I will break when I want the game to stop
         for event in pygame.event.get():  # When starting the game we check for all events
             if event.type == pygame.QUIT:  # If the user closes the window, quit the program
@@ -235,16 +240,31 @@ def snake_loop():
                 elif event.key == pygame.K_ESCAPE:
                     main_game.close_game()
 
+        screen.fill((175, 215, 70))  # rgb tuple defines color of screen
         # Storing time elapsed to calculate whether powerup should be spawned
         time_elapsed = (pygame.time.get_ticks() - time_start) / 1000
-        draw_power_up = main_game.power_up.draw_check(time_elapsed)
-        if draw_power_up:
-            power_up_time = (pygame.time.get_ticks() - time_start) / 1000
-        else:
-            main_game.power_up.draw_powerup()
-
-        screen.fill((175, 215, 70))  # Creating a tuple with rgb values (out of 255) to define the color of the screen
+        # Can only spawn powerup after 5 seconds of gameplay and 5 seconds after the previous powerup was taken
+        if time_elapsed > 5 and not main_game.power_up.is_drawn and power_up_time >= 10:
+            main_game.power_up.draw_check()
         main_game.draw_elements()
+
+        if main_game.power_up.is_eaten:
+            print("eaten")
+            power_up_start = pygame.time.get_ticks()  # Storing activation time for powerup
+            if main_game.power_up.type == 0:  # Powerup effect according to it's type
+                pygame.time.set_timer(SCREEN_UPDATE, 90)
+                print("speed")
+            elif main_game.power_up.type == 1:
+                pygame.time.set_timer(SCREEN_UPDATE, 220)
+                print("slow")
+            main_game.power_up.is_eaten = False
+            is_normal_speed = False
+
+        power_up_time = (pygame.time.get_ticks()-power_up_start)/1000
+        if power_up_time >= 5 and not is_normal_speed:  # Canceling powerup effect after 5 seconds
+            pygame.time.set_timer(SCREEN_UPDATE, 140)
+            print("normal")
+            is_normal_speed = True
 
         if not main_game.game_active:  # Updating the screen
             gamedone_loop(len(main_game.snake.body) - 3, time_elapsed, main_game)  # Calculating the final score and time
@@ -297,10 +317,12 @@ def twoplayer_loop():
                     main_game.close_game()
 
         screen.fill((175, 215, 70))
+        # Storing time elapsed to calculate whether powerup should be spawned
+        time_elapsed = (pygame.time.get_ticks() - time_start) / 1000
         main_game.draw_elements()
+        main_game.power_up.draw_check(time_elapsed)  # The function takes the play time
         if not main_game.game_active:  # Updating the screen
             # Calculating final score and time for two players
-            time_elapsed = pygame.time.get_ticks() - time_start
             score = len(main_game.snake.body) - 3 + len(main_game.snake2.body) - 3
             gamedone_loop(score, time_elapsed, main_game)
             break

@@ -3,7 +3,7 @@ import sys
 import random
 from pygame.math import Vector2
 
-cell_size = 30  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
+cell_size = 25  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
 cell_number = 25  # Defining the amount of cells in the simulated grid
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 
@@ -183,32 +183,36 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
 
 
 class Powerup:  # Defining a class for the fruits that make the snake grow
-    def __init__(self, img='Images/Powerups/Speedup.png'):
+    def __init__(self, img='Images/Powerups/Speedup.PNG'):
         # Setting up variables with x,y coordinates and the position
         self.x = 0
         self.y = 0  # Defining random y position
-        self.image = pygame.image.load(img).convert_alpha()  # Setting up the apple image
-        # Conversion of the photo to size of one cell
-        self.image = pygame.transform.scale(self.image, (cell_size, cell_size))
+        self.type = 0  # Type 0 is speed up powerup, type 1 is slowdown powerup
+        self.image = pygame.image.load(img).convert_alpha()
         self.position = Vector2(self.x, self.y)
         self.randomize()  # Randomizing the position of the apple
-        self.is_powerup = False
+        self.is_drawn = False  # Tracking if there is currently a powerup drawn
+        self.is_eaten = False  # Tracking if the powerup is eaten
 
     # Method to check if the powerup should be drawn and draw it if so
-    def draw_check(self, time):
-        # Every 5 seconds of game time (if there is no powerup) giving a 1 in 4 chance to spawn a power up
-        if time % 5 == 0 and not self.is_powerup:
-            spawn_chance = random.randint(0, 3)
+    def draw_check(self):
+        if not self.is_drawn:
+            spawn_chance = random.randint(0, 500)
             if spawn_chance == 0:
-                self.draw_powerup()
-                return True
-        return False
-
+                self.randomize()
+                self.type = random.randint(0, 1)  # Randomizing powerup type every time it's drawn
+                if self.type == 0:
+                    image = 'Images/Powerups/Speedup.PNG'
+                elif self.type == 1:
+                    image = 'Images/Powerups/Slowdown.PNG'
+                self.image = pygame.image.load(image).convert_alpha()
+                self.image = pygame.transform.scale(self.image, (cell_size, cell_size))
+                self.is_drawn = True
     def draw_powerup(self):  # Method to draw the powerup
-        powerup_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y) * cell_size, cell_size,
+        powerup_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y * cell_size), cell_size,
                                    cell_size)
+        print(self.position)
         screen.blit(self.image, powerup_rect)  # Placing the image where the rectangle is
-        self.is_powerup = True
 
     def randomize(self, snake1=Snake(), snake2=Snake(),
                   twoplayers=False):  # When apple is eaten we will randomize new coordinates for another apple
@@ -222,29 +226,23 @@ class Powerup:  # Defining a class for the fruits that make the snake grow
             elif self.position not in snake1.body:
                 break
 
-    def get_effect(self):
-        if self.type == 0:
-            return 50
-        elif self.type == 1:
-            return 200
-
 
 class Main:
     def __init__(self, twoplayers=False):
         self.snake = Snake()
         self.snake2 = Snake((19, 20, 21), 20, -1, 2)  # Changing position for the second snake
         self.fruit = Fruit()
-        self.fruit2 = Fruit('Images/Fruit/orange.png')  # Different photo for the second fruit
+        self.fruit2 = Fruit('Images/Fruit/orange.png')
         self.game_active = True  # Controlling game state
         self.two_players = twoplayers  # Storing if the game is in two player mode or not
-        self.power_up = Powerup()  # Creating a power up
+        self.power_up = Powerup()
 
     def update(self):  # Method to move the snake when the game updates
         if self.game_active:
             self.snake.move_snake()  # Moving the snake every update
             if self.two_players:  # Moving the second snake before checking for collisions to keep the game updated
                 self.snake2.move_snake()
-            self.check_collision()  # Checking for collision with an apple
+            self.check_collision()  # Checking for collisions with fruit and powerup
             self.check_fail()  # Checking if the player lost
             if self.two_players:
                 self.check_fail_two()  # Checking if the second snake fails
@@ -255,6 +253,8 @@ class Main:
             self.fruit.draw_fruit()
             self.snake.draw_snake()
             self.draw_score()
+            if self.power_up.is_drawn:
+                self.power_up.draw_powerup()
         if self.two_players:
             self.snake2.draw_snake()
             self.fruit2.draw_fruit()
@@ -264,12 +264,20 @@ class Main:
             self.fruit.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
             self.snake.add_block()  # Making the snake longer
             self.snake.play_eat_sound()  # Playing sound of apple eaten
+        if self.power_up.is_drawn and self.power_up.position == self.snake.body[0]:
+            self.power_up.is_drawn = False
+            self.power_up.is_eaten = True
+            print("Powerup eaten")
 
         if self.two_players:
             if self.fruit2.position == self.snake2.body[0]:
                 self.fruit2.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
                 self.snake2.add_block()  # Making the snake longer
                 self.snake2.play_eat_sound()  # Playing sound of apple eaten
+            if self.two_players:
+                if self.power_up.is_drawn and self.power_up.position == self.snake2.body[0]:
+                    self.power_up.is_drawn = False
+                    self.power_up.is_eaten = True
 
     def check_fail(self):  # Checking if the player failed and the game should be over
         # The cell number is are 0 based, so we subtract 1
