@@ -3,7 +3,7 @@ import sys
 import random
 from pygame.math import Vector2
 
-cell_size = 30  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
+cell_size = 28  # Defining cell size of cubes in grid (not an actual grid, but will function as one)
 cell_number = 25  # Defining the amount of cells in the simulated grid
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 

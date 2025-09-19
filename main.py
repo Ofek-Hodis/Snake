@@ -19,7 +19,6 @@ from support_funcs import text_draw
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 clock = pygame.time.Clock()  # Creating a clock object to define the speed of the game
 SCREEN_UPDATE = pygame.USEREVENT  # Creating an event
-pygame.time.set_timer(SCREEN_UPDATE, 140)  # Setting a timer (milliseconds) to trigger the event (game speed)
 
 gameover_sound_played = False  # Defining a variable to prevent replay of gameover sound
 font = 'Fonts/Cute Dino.ttf'
@@ -206,6 +205,7 @@ def gamedone_loop(score, time, main):
 
 
 def snake_loop():
+    pygame.time.set_timer(SCREEN_UPDATE, 150)  # Setting a timer (milliseconds) to trigger the event (game speed)
     main_game = Main()  # An object that will be used to follow the game and execute commands
     time_start = pygame.time.get_ticks()  # storing time at start to calculate run time
     power_up_start = 5  # Set to 5 to avoid activation before first spawn
@@ -260,7 +260,6 @@ def snake_loop():
         power_up_time = (pygame.time.get_ticks()-power_up_start)/1000
         if power_up_time >= 5 and not is_normal_speed:  # Canceling powerup effect after 5 seconds
             pygame.time.set_timer(SCREEN_UPDATE, 140)
-            print("normal")
             is_normal_speed = True
 
         if not main_game.game_active:  # Updating the screen
@@ -272,8 +271,13 @@ def snake_loop():
 
 
 def twoplayer_loop():
+    pygame.time.set_timer(SCREEN_UPDATE, 150)  # Setting a timer (milliseconds) to trigger the event (game speed)
     main_game = Main(True)  # An object that will be used to follow the game and execute commands
     time_start = pygame.time.get_ticks()  # storing time at start to calculate run time
+    power_up_start = 5  # Set to 5 to avoid activation before first spawn
+    power_up_time = 10
+    main_game.power_up.is_eaten = False  # Variable to tell the powerup's effects should be activated
+    is_normal_speed = True  # Variable to track if game speed has been changed
     while True:  # Infinite loop I will break when I want the game to stop
         for event in pygame.event.get():  # When starting the game we check for all events
             if event.type == pygame.QUIT:  # If the user closes the window, quit the program
@@ -316,8 +320,24 @@ def twoplayer_loop():
         screen.fill((175, 215, 70))
         # Storing time elapsed to calculate whether powerup should be spawned
         time_elapsed = (pygame.time.get_ticks() - time_start) / 1000
+        if time_elapsed > 5 and not main_game.power_up.is_drawn and power_up_time >= 10:
+            main_game.power_up.draw_check()
         main_game.draw_elements()
-        main_game.power_up.draw_check(time_elapsed)  # The function takes the play time
+
+        if main_game.power_up.is_eaten:
+            power_up_start = pygame.time.get_ticks()  # Storing activation time for powerup
+            if main_game.power_up.type == 0:  # Powerup effect according to it's type
+                pygame.time.set_timer(SCREEN_UPDATE, 90)
+            elif main_game.power_up.type == 1:
+                pygame.time.set_timer(SCREEN_UPDATE, 220)
+            main_game.power_up.is_eaten = False
+            is_normal_speed = False
+
+        power_up_time = (pygame.time.get_ticks()-power_up_start)/1000
+        if power_up_time >= 5 and not is_normal_speed:  # Canceling powerup effect after 5 seconds
+            pygame.time.set_timer(SCREEN_UPDATE, 140)
+            is_normal_speed = True
+
         if not main_game.game_active:  # Updating the screen
             # Calculating final score and time for two players
             score = len(main_game.snake.body) - 3 + len(main_game.snake2.body) - 3
