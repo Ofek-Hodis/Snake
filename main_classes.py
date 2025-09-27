@@ -236,6 +236,11 @@ class Main:
         self.snake2 = Snake((19, 20, 21), 20, -1, 2)  # Changing position for the second snake
         self.fruit = Fruit()
         self.fruit2 = Fruit('Images/Fruit/orange.png')
+        while True:  # Checking the fruit didn't collide
+            if self.fruit2.position == self.fruit.position:
+                self.fruit2.randomize()
+            else:
+                break
         self.game_active = True  # Controlling game state
         self.two_players = twoplayers  # Storing if the game is in two player mode or not
         self.power_up = Powerup()
@@ -275,8 +280,18 @@ class Main:
         if self.two_players:
             if self.fruit2.position == self.snake2.body[0]:
                 self.fruit2.randomize(self.snake, self.snake2, self.two_players)  # Changing location of the fruit
-                self.snake2.add_block()  # Making the snake longer
-                self.snake2.play_eat_sound()  # Playing sound of apple eaten
+                while True:  # Making sure the fruit don't collide
+                    if self.fruit2.position == self.fruit.position:
+                        self.fruit2.randomize()
+                    else:
+                        break
+                self.snake2.add_block()
+                self.snake2.play_eat_sound()
+            if self.fruit.position == self.snake2.body[0]: # Changing fruit location if the wrong snake tries to eat it
+                self.fruit.randomize(self.snake2, self.snake2, self.two_players)
+            if self.fruit2.position == self.snake.body[0]: # Changing fruit location if the wrong snake tries to eat it
+                self.fruit2.randomize(self.snake2, self.snake2, self.two_players)
+
             if self.power_up.is_drawn and self.power_up.position == self.snake2.body[0]:
                 self.power_up.is_drawn = False
                 self.power_up.is_eaten = True
