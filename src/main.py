@@ -1,19 +1,19 @@
 import pygame  # Importing pygame for the creation of the game
 import sys  # Importing sys to use the exit function to halt the code
 from pygame.math import Vector2  # Importing the specific function to facilitate code writing
-from button import Button  # Importing button class
+from src.button import Button  # Importing button class
 import random  # Importing random to generate fruit coordinates
 
 # Importing functions to store and get high score
-from support_funcs import get_high_score, get_high_score_twoplayer, store_high_score, store_high_score_twoplayer
+from src.support_funcs import get_high_score, get_high_score_twoplayer, store_high_score, store_high_score_twoplayer
 
 # Code to set up delay in sound so that it fits the actions
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()  # Initiating pygame
 
 # To import Main we must initiate pygame firstly
-from main_classes import cell_number, cell_size, Main  # Imported variables and the Main class to run the main code
-from support_funcs import text_draw
+from src.main_classes import cell_number, cell_size, Main  # Imported variables and the Main class to run the main code
+from src.support_funcs import text_draw
 
 # Creating the window and defining the width and height
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
@@ -21,7 +21,7 @@ clock = pygame.time.Clock()  # Creating a clock object to define the speed of th
 SCREEN_UPDATE = pygame.USEREVENT  # Creating an event
 
 gameover_sound_played = False  # Defining a variable to prevent replay of gameover sound
-font = 'Fonts/Cute Dino.ttf'
+font = 'Assets/Fonts/Cute Dino.ttf'
 
 
 def menu_loop():
@@ -39,7 +39,7 @@ def menu_loop():
         start_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
         start_button = Button(None, start_position, "Single player mode", start_font,
-                              (100, 100, 100), (150, 150, 150), "Sounds/menu_select.wav")
+                              (100, 100, 100), (150, 150, 150), "Assets/Sounds/menu_select.wav")
         start_button.update(screen)  # The function to display the button
         start_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(start_button.text, start_button.rect)
@@ -50,7 +50,7 @@ def menu_loop():
         two_player_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
         two_player_button = Button(None, two_player_position, "Two player mode", start_font,
-                                   (100, 100, 100), (150, 150, 150), "Sounds/menu_select.wav")
+                                   (100, 100, 100), (150, 150, 150), "Assets/Sounds/menu_select.wav")
         two_player_button.update(screen)  # The function to display the button
         two_player_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(two_player_button.text, two_player_button.rect)
@@ -61,7 +61,7 @@ def menu_loop():
         quit_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
         quit_button = Button(None, quit_position, "Quit", quit_font,
-                             (100, 100, 100), (150, 150, 150), "Sounds/menu_select.wav")
+                             (100, 100, 100), (150, 150, 150), "Assets/Sounds/menu_select.wav")
         quit_button.update(screen)  # The function to display the button
         quit_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(quit_button.text, quit_button.rect)
@@ -93,7 +93,7 @@ def gameover_actions(score, main):
     global gameover_sound_played  # Letting the function know I use the variable from outside of it
     if not gameover_sound_played:
         # Playing game over sound
-        losing_sound = pygame.mixer.Sound('Sounds/game_over.wav')
+        losing_sound = pygame.mixer.Sound('Assets/Sounds/game_over.wav')
         losing_sound.set_volume(0.15)  # Lowering the volume of the sound
         losing_sound.play()  # Playing the game over sound
         gameover_sound_played = True
@@ -152,7 +152,7 @@ def gamedone_loop(score, time, main):
         single_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
         single_button = Button(None, single_position, "Single player mode", single_font,
-                                (100, 100, 100), (200, 200, 200), "Sounds/menu_select.wav")
+                                (100, 100, 100), (200, 200, 200), "Assets/Sounds/menu_select.wav")
         single_button.update(screen)  # The function to display the button
         single_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(single_button.text, single_button.rect)
@@ -163,7 +163,7 @@ def gamedone_loop(score, time, main):
         two_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
         two_button = Button(None, two_position, "Two players mode", two_font,
-                               (100, 100, 100), (200, 200, 200), "Sounds/menu_select.wav")
+                               (100, 100, 100), (200, 200, 200), "Assets/Sounds/menu_select.wav")
         two_button.update(screen)  # The function to display the button
         two_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(two_button.text, two_button.rect)
@@ -174,7 +174,7 @@ def gamedone_loop(score, time, main):
         quit_font = pygame.font.Font(font, 35)
         # Using the Button class to create the button
         quit_button = Button(None, quit_position, "Quit", quit_font,
-                             (100, 100, 100), (200, 200, 200), "Sounds/menu_select.wav")
+                             (100, 100, 100), (200, 200, 200), "Assets/Sounds/menu_select.wav")
         quit_button.update(screen)  # The function to display the button
         quit_button.change_color(pygame.mouse.get_pos())  # Checking if the mouse is hovering over the button
         screen.blit(quit_button.text, quit_button.rect)
@@ -348,4 +348,5 @@ def twoplayer_loop():
         clock.tick(60)  # Limiting the loop (and the game) to 60 fps
 
 
-menu_loop()
+def run():
+    menu_loop()
