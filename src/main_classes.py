@@ -169,15 +169,18 @@ class Fruit:  # Defining a class for the fruits that make the snake grow
                                  cell_size)
         screen.blit(self.image, fruit_rect)  # Placing the image where the rectangle is
 
-    def randomize(self, snake1=Snake(), snake2=Snake(), twoplayers=False):
+    def randomize(self, snake1=None, snake2=None, twoplayers=False):
         while True:
             self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
             self.y = random.randint(0, cell_number - 1)  # Defining random y position
             self.position = Vector2(self.x, self.y)
-            if twoplayers:
-                if self.position not in snake1.body and self.position not in snake2.body:
+            if snake1 is not None and snake2 is not None:
+                if twoplayers:
+                    if self.position not in snake1.body and self.position not in snake2.body:
+                        break
+                elif self.position not in snake1.body:
                     break
-            elif self.position not in snake1.body:
+            else:
                 break
 
 
@@ -217,16 +220,19 @@ class Powerup:
                                    cell_size)
         screen.blit(self.image, powerup_rect)
 
-    def randomize(self, snake1=Snake(), snake2=Snake(),
+    def randomize(self, snake1=None, snake2=None,
                   twoplayers=False):
         while True:
             self.x = random.randint(0, cell_number - 1)  # Defining random x position on the simulated grid
             self.y = random.randint(0, cell_number - 1)  # Defining random y position
             self.position = Vector2(self.x, self.y)
-            if twoplayers:
-                if self.position not in snake1.body and self.position not in snake2.body:
+            if snake1 is not None and snake2 is not None:
+                if twoplayers:
+                    if self.position not in snake1.body and self.position not in snake2.body:
+                        break
+                elif self.position not in snake1.body:
                     break
-            elif self.position not in snake1.body:
+            else:
                 break
 
 
