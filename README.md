@@ -26,26 +26,25 @@ This project was created to practice game loops, class creation and usage, colli
 ---
 
 ## Requirements
-Python 3.10+ (Developed and tested on Python 3.13.7)
+Python 3.10+ (Developed and tested on Python 3.13.7)<br>
 Pygame 2.1.0+ (Developed and tested on version 2.6.1)
-
 
 ---
 
 ## Installation
-1. Clone the repository:
-  git clone https://github.com/Ofek-Hodis/Snake
-  cd Snake
-2. Install requirements (see above)
-  Example:
-    pip install pygame
-3. Run the game:
-   Python run.py
+1. Clone the repository:<br>
+  git clone https://github.com/Ofek-Hodis/Snake<br>
+  cd Snake<br>
+2. Install requirements (see above)<br>
+  Example:<br>
+    pip install pygame<Br>
+3. Run the game:<br>
+   Python run.py<br>
 
 ---
 
 ## Controls
-For single-player, arrow-keys control the snake; use esc to close the game at any time.
+For single-player, arrow-keys control the snake; use esc to close the game at any time.<br>
 For two-player mode, the same controls apply. Use WASD to control the second snake.
 
 ---
@@ -68,21 +67,21 @@ For two-player mode, the same controls apply. Use WASD to control the second sna
 
 ## Project Structure
 
-Snake/
-├── Assets/                   # Game assets (visuals and audio)
-│   ├── Fonts/                # Font files for UI and text display
-│   ├── Images/               # Game images (such as for the snake or fruit)
-│   └── Sounds/               # Sound effects
-├── Data/                     # Persistent game data
-│   └── high_score.json       # Stores player high scores
-├── src/                      # Source code for game logic
-│   ├── button.py             # Button handling logic for UI
-│   ├── main.py               # Code for game and menu loops
-│   ├── main_classes.py       # Core game classes (Main, Snake, Fruit...)
-│   └── support_funcs.py      # Helper and utility functions
-├── .gitignore                # Ignore files/folders not to be tracked by git
-├── LICENSE                   # License file (project usage rights)
-├── README.md                 # Project documentation and overview
+Snake/<Br>
+├── Assets/                   # Game assets (visuals and audio)<br>
+│   ├── Fonts/                # Font files for UI and text display<br>
+│   ├── Images/               # Game images (such as for the snake or fruit)<br>
+│   └── Sounds/               # Sound effects<br>
+├── Data/                     # Persistent game data<br>
+│   └── high_score.json       # Stores player high scores<br>
+├── src/                      # Source code for game logic<br>
+│   ├── button.py             # Button handling logic for UI<br>
+│   ├── main.py               # Code for game and menu loops<br>
+│   ├── main_classes.py       # Core game classes (Main, Snake, Fruit...)<br>
+│   └── support_funcs.py      # Helper and utility functions<br>
+├── .gitignore                # Ignore files/folders not to be tracked by git<br>
+├── LICENSE                   # License file (project usage rights)<br>
+├── README.md                 # Project documentation and overview<br>
 └── run.py                    # Module used to launch the game from the root
 
 ---
