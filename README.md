@@ -1,5 +1,5 @@
 # Snake
-A snake game with speed altering powerups and a two-player function created using **Python** and **Pygame**, following object oriented principles.
+A snake game with speed altering powerups and a two-player mode created using **Python** and **Pygame**, following object oriented principles.
 This project was created to practice game loops, class creation and usage, collision detection and menu creation using Pygame.
 
 ---
@@ -17,7 +17,7 @@ This project was created to practice game loops, class creation and usage, colli
 
 ## Features
 - Classic snake features (collision detection, fruit collection, snake growth)
-- Two-player mode with collisions checks between snakes
+- Two-player mode with collision checks between snakes
 - Menus (Main menu and game over menu allowing access to single-player mode and two-player mode using buttons
 - Time and score tracking (as well as high score tracking for each mode using a JSON file)
 - Speed changing power ups (randomly spawning and altering game-speed when collected)
@@ -45,7 +45,9 @@ Pygame 2.1.0+ (Developed and tested on version 2.6.1)
 
 ## Controls
 For single-player, arrow-keys control the snake; use esc to close the game at any time.<br>
-For two-player mode, the same controls apply. Use WASD to control the second snake.
+For two-player mode, the same controls apply. Use WASD to control the second snake.<br><br>
+
+At any moment, 'esc' can be used to quit the game, 'r' to restart it and 'p' to pause it 
 
 ---
 
@@ -66,7 +68,7 @@ For two-player mode, the same controls apply. Use WASD to control the second sna
 
 
 ## Project Structure
-
+```
 Snake/<Br>
 ├── Assets/                   # Game assets (visuals and audio)<br>
 │   ├── Fonts/                # Font files for UI and text display<br>
@@ -83,11 +85,10 @@ Snake/<Br>
 ├── LICENSE                   # License file (project usage rights)<br>
 ├── README.md                 # Project documentation and overview<br>
 └── run.py                    # Module used to launch the game from the root
-
+```
 ---
 
 ## Possible Future Improvements
-- Add pause/resume functionality.
 - Add three player game-mode.
 - Additional powerups.
 - Background music.

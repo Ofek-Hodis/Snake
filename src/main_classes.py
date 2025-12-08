@@ -248,18 +248,20 @@ class Main:
             else:
                 break
         self.game_active = True  # Controlling game state
+        self.is_paused = False
         self.two_players = twoplayers  # Storing if the game is in two player mode or not
         self.power_up = Powerup()
 
     def update(self):  # Method to move the snake when the game updates
         if self.game_active:
-            self.snake.move_snake()  # Moving the snake every update
-            if self.two_players:  # Moving the second snake before checking for collisions to keep the game updated
-                self.snake2.move_snake()
-            self.check_collision()  # Checking for collisions with fruit and powerup
-            self.check_fail()  # Checking if the player lost
-            if self.two_players:
-                self.check_fail_two()  # Checking if the second snake fails
+            if not self.is_paused:
+                self.snake.move_snake()
+                if self.two_players:  # Moving the second snake before checking for collisions to keep the game updated
+                    self.snake2.move_snake()
+                self.check_collision()  # Checking for collisions with fruit and powerup
+                self.check_fail()  # Checking if the player lost
+                if self.two_players:
+                    self.check_fail_two()  # Checking if the second snake fails
 
     def draw_elements(self):  # Method to draw the fruit, snake and the score
         if self.game_active:
@@ -267,6 +269,8 @@ class Main:
             self.fruit.draw_fruit()
             self.snake.draw_snake()
             self.draw_score()
+            if self.is_paused:
+                self.draw_pause()
             if self.power_up.is_drawn:
                 self.power_up.draw_powerup()
         if self.two_players:
@@ -315,7 +319,6 @@ class Main:
                 print("Snake collided with itself!")
                 self.game_active = False  # Changing to false so the game stops running
 
-
     def check_fail_two(self):
         # Checking if snake 2 is out of bounds
         if (not 0 <= self.snake2.body[0].x < cell_number) or (not 0 <= self.snake2.body[0].y < cell_number):
@@ -339,7 +342,6 @@ class Main:
             if block == self.snake.body[0]:
                 print("Snake 1 collided with snake 2!")
                 self.game_active = False  # Changing to false so the game stops running
-
 
     @staticmethod  # The method doesn't use self
     def close_game():  # Method to quit the game
@@ -373,5 +375,22 @@ class Main:
         score_rect = score_surface.get_rect(center=(score_x, score_y))
 
         screen.blit(score_surface, score_rect)
+
+    def pause_pressed(self):  # Pausing or un-pausing the game
+        if self.is_paused:
+            self.is_paused = False
+        else:
+            self.is_paused = True
+
+    @staticmethod
+    def draw_pause():
+        font = pygame.font.Font('Assets/Fonts/Cute Dino.ttf', 35)
+        pause_surface = font.render("Paused", True, (255, 255, 255))
+        pause_x = int(cell_size*cell_number/2)  # Defining the coordinates for the score
+        pause_y = int(cell_size*2)
+        # Placing the center of the score rectangle in the coordinates
+        pause_rect = pause_surface.get_rect(center=(pause_x, pause_y))
+
+        screen.blit(pause_surface, pause_rect)
 
 

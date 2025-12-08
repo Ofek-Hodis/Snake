@@ -213,32 +213,35 @@ def snake_loop():
     main_game.power_up.is_eaten = False  # Variable to tell the powerup's effects should be activated
     is_normal_speed = True  # Variable to track if game speed has been changed
 
-    while True:  # Infinite loop I will break when I want the game to stop
+    while True:
         for event in pygame.event.get():  # When starting the game we check for all events
             if event.type == pygame.QUIT:  # If the user closes the window, quit the program
                 pygame.quit()
-                sys.exit()  # Halting the code
-            if event.type == SCREEN_UPDATE:  # Moving the snake constantly when updating the screen
+                sys.exit()
+            if event.type == SCREEN_UPDATE:
                 main_game.update()
-            if event.type == pygame.KEYDOWN:  # Checking for user input and defining direction by the key
-                if event.key == pygame.K_UP:
-                    if main_game.snake.direction.y != 1:  # Preventing direction change from up to down
-                        main_game.snake.next_direction = Vector2(0, -1)
-                if event.key == pygame.K_DOWN:
-                    if main_game.snake.direction.y != -1:  # Preventing direction change from down to up
-                        main_game.snake.next_direction = Vector2(0, 1)
-                if event.key == pygame.K_RIGHT:
-                    if main_game.snake.direction.x != -1:
-                        main_game.snake.next_direction = Vector2(1, 0)  # Preventing direction change from left to right
-                if event.key == pygame.K_LEFT:
-                    if main_game.snake.direction.x != 1:
-                        main_game.snake.next_direction = Vector2(-1,
-                                                                 0)  # Preventing direction change from right to left
+            if event.type == pygame.KEYDOWN:
+                if not main_game.is_paused:  # Only allowing direction changes when not paused
+                    if event.key == pygame.K_UP:  # if chain to prevent 180 degrees direction change
+                        if main_game.snake.direction.y != 1:
+                            main_game.snake.next_direction = Vector2(0, -1)
+                    if event.key == pygame.K_DOWN:
+                        if main_game.snake.direction.y != -1:
+                            main_game.snake.next_direction = Vector2(0, 1)
+                    if event.key == pygame.K_RIGHT:
+                        if main_game.snake.direction.x != -1:
+                            main_game.snake.next_direction = Vector2(1, 0)
+                    if event.key == pygame.K_LEFT:
+                        if main_game.snake.direction.x != 1:
+                            main_game.snake.next_direction = Vector2(-1,
+                                                                     0)
 
                 if event.key == pygame.K_r:
                     main_game = Main()  # Restarting the game if the input is r
                 elif event.key == pygame.K_ESCAPE:
                     main_game.close_game()
+                elif event.key == pygame.K_p:
+                    main_game.pause_pressed()
 
         screen.fill((175, 215, 70))  # rgb tuple defines color of screen
         # Storing time elapsed to calculate whether powerup should be spawned
@@ -263,7 +266,7 @@ def snake_loop():
             is_normal_speed = True
 
         if not main_game.game_active:  # Updating the screen
-            gamedone_loop(len(main_game.snake.body) - 3, time_elapsed, main_game)  # Calculating the final score and time
+            gamedone_loop(len(main_game.snake.body) - 3, time_elapsed, main_game)  # Calculating final score and time
             break
 
         pygame.display.update()
@@ -287,35 +290,38 @@ def twoplayer_loop():
                 main_game.update()
             # Defining direction by input and preventing changing direction by 180 degrees
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    if main_game.snake.direction.y != 1:
-                        main_game.snake.next_direction = Vector2(0, -1)
-                if event.key == pygame.K_DOWN:
-                    if main_game.snake.direction.y != -1:
-                        main_game.snake.next_direction = Vector2(0, 1)
-                if event.key == pygame.K_RIGHT:
-                    if main_game.snake.direction.x != -1:
-                        main_game.snake.next_direction = Vector2(1, 0)
-                if event.key == pygame.K_LEFT:
-                    if main_game.snake.direction.x != 1:
-                        main_game.snake.next_direction = Vector2(-1, 0)
-                if event.key == pygame.K_w:
-                    if main_game.snake2.direction.y != 1:
-                        main_game.snake2.next_direction = Vector2(0, -1)
-                if event.key == pygame.K_s:
-                    if main_game.snake2.direction.y != -1:
-                        main_game.snake2.next_direction = Vector2(0, 1)
-                if event.key == pygame.K_d:
-                    if main_game.snake2.direction.x != -1:
-                        main_game.snake2.next_direction = Vector2(1, 0)
-                if event.key == pygame.K_a:
-                    if main_game.snake2.direction.x != 1:
-                        main_game.snake2.next_direction = Vector2(-1, 0)
+                if not main_game.is_paused:  # Only allowing direction changes when not paused
+                    if event.key == pygame.K_UP:
+                        if main_game.snake.direction.y != 1:
+                            main_game.snake.next_direction = Vector2(0, -1)
+                    if event.key == pygame.K_DOWN:
+                        if main_game.snake.direction.y != -1:
+                            main_game.snake.next_direction = Vector2(0, 1)
+                    if event.key == pygame.K_RIGHT:
+                        if main_game.snake.direction.x != -1:
+                            main_game.snake.next_direction = Vector2(1, 0)
+                    if event.key == pygame.K_LEFT:
+                        if main_game.snake.direction.x != 1:
+                            main_game.snake.next_direction = Vector2(-1, 0)
+                    if event.key == pygame.K_w:
+                        if main_game.snake2.direction.y != 1:
+                            main_game.snake2.next_direction = Vector2(0, -1)
+                    if event.key == pygame.K_s:
+                        if main_game.snake2.direction.y != -1:
+                            main_game.snake2.next_direction = Vector2(0, 1)
+                    if event.key == pygame.K_d:
+                        if main_game.snake2.direction.x != -1:
+                            main_game.snake2.next_direction = Vector2(1, 0)
+                    if event.key == pygame.K_a:
+                        if main_game.snake2.direction.x != 1:
+                            main_game.snake2.next_direction = Vector2(-1, 0)
 
                 if event.key == pygame.K_r:
                     main_game = Main()  # Restarting the game if the input is r
                 elif event.key == pygame.K_ESCAPE:
                     main_game.close_game()
+                elif event.key == pygame.K_p:
+                    main_game.pause_pressed()
 
         screen.fill((175, 215, 70))
         # Storing time elapsed to calculate whether powerup should be spawned
